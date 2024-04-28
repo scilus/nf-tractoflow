@@ -36,6 +36,66 @@
                     }
                 }
             }
+        },
+        "https://github.com/scilus/nf-scil.git": {
+            "modules": {
+                "nf-scil": {
+                    "betcrop/cropvolume": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "8a5ea101e53d2bb73618ca71bf9817df0e470e37",
+                        "installed_by": ["preproc_dwi"]
+                    },
+                    "betcrop/fslbetcrop": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "de49903e49cabf71a942b43e6320617aa8dc8a43",
+                        "installed_by": ["preproc_dwi"]
+                    },
+                    "denoising/mppca": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "317f9f98b9b1faa93e72ff61560bb765d6fdc364",
+                        "installed_by": ["preproc_dwi"]
+                    },
+                    "preproc/eddy": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "34ab56fc5bcd2745f99c9b56c96b614e39c2f3bc",
+                        "installed_by": ["topup_eddy"]
+                    },
+                    "preproc/n4": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "317f9f98b9b1faa93e72ff61560bb765d6fdc364",
+                        "installed_by": ["preproc_dwi"]
+                    },
+                    "preproc/normalize": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "317f9f98b9b1faa93e72ff61560bb765d6fdc364",
+                        "installed_by": ["preproc_dwi"]
+                    },
+                    "preproc/topup": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "5faed0ec2aa8007b3abfd6d385ff8fa8e6141893",
+                        "installed_by": ["topup_eddy"]
+                    },
+                    "utils/extractb0": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "317f9f98b9b1faa93e72ff61560bb765d6fdc364",
+                        "installed_by": ["topup_eddy"]
+                    }
+                }
+            },
+            "subworkflows": {
+                "nf-scil": {
+                    "preproc_dwi": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "03dacc58f42ef75764bcd74a0bbb6e4709e38796",
+                        "installed_by": ["subworkflows"]
+                    },
+                    "topup_eddy": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "34ab56fc5bcd2745f99c9b56c96b614e39c2f3bc",
+                        "installed_by": ["preproc_dwi"]
+                    }
+                }
+            }
         }
     }
 }
