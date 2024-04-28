@@ -1,0 +1,106 @@
+{
+    "topup_eddy_rev_b0": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "test",
+                        "single_end": false
+                    },
+                    "test__b0_bet_mask.nii.gz:md5,fc1f94e2a5e2cf5197d7fdc28a83ca28"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test",
+                        "single_end": false
+                    },
+                    "test__bval_eddy:md5,d070c09214fb3333dce17cae50202aa9"
+                ]
+            ],
+            [
+                "versions.yml:md5,5af3f2becfc5b99563365a86fc38fc21",
+                "versions.yml:md5,76cab382c75fc0f861e01b34532789a4",
+                "versions.yml:md5,f4dfd5f1c68f28be5dc9abe67eb673e4"
+            ],
+            "test__dwi_corrected.nii.gz",
+            "test__dwi_eddy_corrected.bvec",
+            "test_b0.nii.gz"
+        ],
+        "meta": {
+            "nf-test": "0.8.4",
+            "nextflow": "23.10.1"
+        },
+        "timestamp": "2024-04-25T16:03:55.680588"
+    },
+    "eddy": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "test",
+                        "single_end": false
+                    },
+                    "test__b0_bet_mask.nii.gz:md5,3574cc8f29da429a0f610f2572c4886c"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test",
+                        "single_end": false
+                    },
+                    "test__bval_eddy:md5,d070c09214fb3333dce17cae50202aa9"
+                ]
+            ],
+            [
+                "versions.yml:md5,76cab382c75fc0f861e01b34532789a4",
+                "versions.yml:md5,f4dfd5f1c68f28be5dc9abe67eb673e4"
+            ],
+            "test__dwi_corrected.nii.gz",
+            "test__dwi_eddy_corrected.bvec",
+            "test_b0.nii.gz"
+        ],
+        "meta": {
+            "nf-test": "0.8.4",
+            "nextflow": "23.10.1"
+        },
+        "timestamp": "2024-04-25T15:35:56.386137"
+    },
+    "topup_eddy_rev_dwi": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "test",
+                        "single_end": false
+                    },
+                    "test__b0_bet_mask.nii.gz:md5,fc1f94e2a5e2cf5197d7fdc28a83ca28"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test",
+                        "single_end": false
+                    },
+                    "test__bval_eddy:md5,be4e72882f347bec4fcf5380f900719d"
+                ]
+            ],
+            [
+                "versions.yml:md5,5af3f2becfc5b99563365a86fc38fc21",
+                "versions.yml:md5,76cab382c75fc0f861e01b34532789a4",
+                "versions.yml:md5,f4dfd5f1c68f28be5dc9abe67eb673e4"
+            ],
+            "test__dwi_corrected.nii.gz",
+            "test__dwi_eddy_corrected.bvec",
+            "test_b0.nii.gz"
+        ],
+        "meta": {
+            "nf-test": "0.8.4",
+            "nextflow": "23.10.1"
+        },
+        "timestamp": "2024-04-25T16:13:13.589347"
+    }
+}
