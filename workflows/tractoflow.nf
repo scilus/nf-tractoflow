@@ -10,10 +10,13 @@ include { paramsSummaryMultiqc    } from '../subworkflows/nf-core/utils_nfcore_p
 include { softwareVersionsToYAML  } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { methodsDescriptionText  } from '../subworkflows/local/utils_nfcore_tractoflow_pipeline'
 
-include { PREPROC_DWI             } from '../subworkflows/nf-scil/preproc_dwi/main'
-include { PREPROC_T1              } from '../subworkflows/nf-scil/preproc_t1/main'
-include { REGISTRATION            } from '../subworkflows/nf-scil/registration/main'
-include { ANATOMICAL_SEGMENTATION } from '../subworkflows/nf-scil/anatomical_segmentation/main'
+// PREPROCESSING
+include { PREPROC_DWI                                              } from '../subworkflows/nf-scil/preproc_dwi/main'
+include { PREPROC_T1                                               } from '../subworkflows/nf-scil/preproc_t1/main'
+include { RECONST_DTIMETRICS as REGISTRATION_FA                    } from '../modules/nf-scil/reconst/dtimetrics/main'
+include { REGISTRATION as T1_REGISTRATION                          } from '../subworkflows/nf-scil/registration/main'
+include { REGISTRATION_ANTSAPPLYTRANSFORMS as TRANSFORM_FREESURFER } from '../modules/nf-scil/registration/antsapplytransforms/main'
+include { ANATOMICAL_SEGMENTATION                                  } from '../subworkflows/nf-scil/anatomical_segmentation/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -35,8 +38,13 @@ workflow TRACTOFLOW {
 
     ch_samplesheet.view()
 
+    /* Load topup config if provided */
     if ( params.topup_config ) ch_topup_config = Channel.fromPath(
         params.topup_config, checkIfExists: true)
+
+    /* Load bet template */
+    ch_bet_template = Channel.fromPath(params.t1_bet_template, checkIfExists: true)
+    ch_bet_probability = Channel.fromPath(params.t1_bet_probability, checkIfExists: true)
 
     /* Unpack inputs */
     ch_inputs = ch_samplesheet
@@ -62,11 +70,48 @@ workflow TRACTOFLOW {
     // SUBWORKFLOW: Run PREPROC_T1
     //
     PREPROC_T1(
-        ch_inputs.t1
+        ch_inputs.t1,
+        ch_bet_template,
+        ch_bet_probability,
+        [], [], []
     )
 
-    ANATOMICAL_SEGMENTATION(
+    //
+    // MODULE: Run RECONST/DTIMETRICS (REGISTRATION_FA)
+    //
+    ch_registration_fa = PREPROC_DWI.out.dwi_resample
+        .join(PREPROC_DWI.out.bval)
+        .join(PREPROC_DWI.out.bvec)
+        .join(PREPROC_DWI.out.b0_mask)
+
+    REGISTRATION_FA(
+        ch_registration_fa
+    )
+
+    //
+    // SUBWORKFLOW: Run REGISTRATION
+    //
+    T1_REGISTRATION(
         PREPROC_T1.out.t1_final,
+        PREPROC_DWI.out.b0,
+        REGISTRATION_FA.out.fa,
+        []
+    )
+
+    //
+    // MODULE: Run REGISTRATION_ANTSAPPLYTRANSFORMS (TRANSFORM_FREESURFER)
+    //
+
+    TRANSFORM_FREESURFER(
+        PREPROC_DWI.out.b0,
+        T1_REGISTRATION.out.transfo_image
+    )
+
+    //
+    // SUBWORKFLOW: Run ANATOMICAL_SEGMENTATION
+    //
+    ANATOMICAL_SEGMENTATION(
+        T1_REGISTRATION.out.image_warped,
         ch_inputs.parc
     )
 

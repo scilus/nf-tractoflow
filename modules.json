@@ -95,6 +95,11 @@
                         "git_sha": "5faed0ec2aa8007b3abfd6d385ff8fa8e6141893",
                         "installed_by": ["topup_eddy"]
                     },
+                    "reconst/dtimetrics": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "317f9f98b9b1faa93e72ff61560bb765d6fdc364",
+                        "installed_by": ["modules"]
+                    },
                     "register/anattodwi": {
                         "branch": "review/alex_preproc_dwi",
                         "git_sha": "317f9f98b9b1faa93e72ff61560bb765d6fdc364",
@@ -104,6 +109,11 @@
                         "branch": "review/alex_preproc_dwi",
                         "git_sha": "317f9f98b9b1faa93e72ff61560bb765d6fdc364",
                         "installed_by": ["registration"]
+                    },
+                    "registration/antsapplytransforms": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "4c7e79daf65774c9f11937d0dcab117ae6eb64a1",
+                        "installed_by": ["modules"]
                     },
                     "segmentation/fastseg": {
                         "branch": "review/alex_preproc_dwi",
