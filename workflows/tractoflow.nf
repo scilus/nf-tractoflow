@@ -4,12 +4,16 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { FASTQC                 } from '../modules/nf-core/fastqc/main'
-include { MULTIQC                } from '../modules/nf-core/multiqc/main'
-include { paramsSummaryMap       } from 'plugin/nf-validation'
-include { paramsSummaryMultiqc   } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_tractoflow_pipeline'
+include { MULTIQC                 } from '../modules/nf-core/multiqc/main'
+include { paramsSummaryMap        } from 'plugin/nf-validation'
+include { paramsSummaryMultiqc    } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { softwareVersionsToYAML  } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { methodsDescriptionText  } from '../subworkflows/local/utils_nfcore_tractoflow_pipeline'
+
+include { PREPROC_DWI             } from '../subworkflows/nf-scil/preproc_dwi/main'
+include { PREPROC_T1              } from '../subworkflows/nf-scil/preproc_t1/main'
+include { REGISTRATION            } from '../subworkflows/nf-scil/registration/main'
+include { ANATOMICAL_SEGMENTATION } from '../subworkflows/nf-scil/anatomical_segmentation/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -26,15 +30,45 @@ workflow TRACTOFLOW {
 
     ch_versions = Channel.empty()
     ch_multiqc_files = Channel.empty()
+    ch_topup_config = null
+    ch_bet_template = Channel.empty()
+
+    ch_samplesheet.view()
+
+    if ( params.topup_config ) ch_topup_config = Channel.fromPath(
+        params.topup_config, checkIfExists: true)
+
+    /* Unpack inputs */
+    ch_inputs = ch_samplesheet
+        .multiMap{ id, dwi, bval, bvec, sbref, rev_dwi, rev_bval, rev_bvec, rev_sbref, t1, wmparc, aparc_aseg ->
+            dwi: [[id: id], dwi, bval, bvec],
+            sbref: [[id: id], sbref],
+            rev_dwi: [[id: id], rev_dwi, rev_bval, rev_bvec],
+            rev_sbref: [[id: id], rev_sbref],
+            t1: [[id: id], t1],
+            parc: [[id: id], wmparc, aparc_aseg]
+        }
 
     //
-    // MODULE: Run FastQC
+    // SUBWORKFLOW: Run PREPROC_DWI
     //
-    FASTQC (
-        ch_samplesheet
+    PREPROC_DWI(
+        ch_inputs.dwi, ch_inputs.rev_dwi,
+        ch_inputs.sbref, ch_inputs.rev_sbref,
+        ch_topup_config
     )
-    ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]})
-    ch_versions = ch_versions.mix(FASTQC.out.versions.first())
+
+    //
+    // SUBWORKFLOW: Run PREPROC_T1
+    //
+    PREPROC_T1(
+        ch_inputs.t1
+    )
+
+    ANATOMICAL_SEGMENTATION(
+        PREPROC_T1.out.t1_final,
+        ch_inputs.parc
+    )
 
     //
     // Collate and save software versions

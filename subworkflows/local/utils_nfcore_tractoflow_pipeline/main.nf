@@ -8,9 +8,11 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
+import groovy.json.*
+
 include { UTILS_NFVALIDATION_PLUGIN } from '../../nf-core/utils_nfvalidation_plugin'
 include { paramsSummaryMap          } from 'plugin/nf-validation'
-include { fromSamplesheet           } from 'plugin/nf-validation'
+include { samplesheetToList         } from 'plugin/nf-schema'
 include { UTILS_NEXTFLOW_PIPELINE   } from '../../nf-core/utils_nextflow_pipeline'
 include { completionEmail           } from '../../nf-core/utils_nfcore_pipeline'
 include { completionSummary         } from '../../nf-core/utils_nfcore_pipeline'
@@ -19,6 +21,8 @@ include { nfCoreLogo                } from '../../nf-core/utils_nfcore_pipeline'
 include { imNotification            } from '../../nf-core/utils_nfcore_pipeline'
 include { UTILS_NFCORE_PIPELINE     } from '../../nf-core/utils_nfcore_pipeline'
 include { workflowCitation          } from '../../nf-core/utils_nfcore_pipeline'
+
+include { IO_READBIDS               } from '../modules/nf-scil/io/readbids/main'
 
 /*
 ========================================================================================
@@ -76,25 +80,63 @@ workflow PIPELINE_INITIALISATION {
     //
     // Create channel from input file provided through params.input
     //
-    Channel
-        .fromSamplesheet("input")
-        .map {
-            meta, fastq_1, fastq_2 ->
-                if (!fastq_2) {
-                    return [ meta.id, meta + [ single_end:true ], [ fastq_1 ] ]
-                } else {
-                    return [ meta.id, meta + [ single_end:false ], [ fastq_1, fastq_2 ] ]
+    ch_input_sheets = Channel
+        .fromList(samplesheetToList(params.input, "assets/schema_input.json"))
+        .branch {
+            bids: it.size() == 4
+            raw: true
+        }
+
+    IO_READBIDS ( ch_input_sheets.bids )
+    ch_versions = ch_versions.mix(IO_READBIDS.out.versions)
+
+    ///
+    /// Unpack BIDS into subjects
+    ///
+    ch_samplesheet = IO_READBIDS.out.bids.map{
+        jsonSlurper = new JsonSlurper()
+        data = jsonSlurper.parseText(it.getText())
+        for (item in data){
+            sid = "sub-" + item.subject
+
+            if (item.session)
+            {
+                sid += "_ses-" + item.session
+            }
+
+            if (item.run)
+            {
+                sid += "_run-" + item.run
+            }
+
+            for (key in item.keySet())
+            {
+                if(item[key] == 'todo')
+                {
+                    error "Error ~ Please look at your tractoflow_bids_struct.json " +
+                    "in Read_BIDS folder.\nPlease fix todo fields and give " +
+                    "this file in input using --bids_config option instead of " +
+                    "using --bids."
                 }
+                else if (item[key] == 'error_readout')
+                {
+                    error "Error ~ Please look at your tractoflow_bids_struct.json " +
+                    "in Read_BIDS folder.\nPlease fix error_readout fields. "+
+                    "This error indicate that readout time looks wrong.\n"+
+                    "Please correct the value or remove the subject in the json and " +
+                    "give the updated file in input using --bids_config option instead of " +
+                    "using --bids."
+                }
+            }
+
+            return [sid,
+                file(item.dwi), file(item.bval), file(item.bvec), file(item.topup),
+                file(item.rev_dwi), file(item.rev_bval), file(item.rev_bvec), file(item.rev_topup),
+                file(item.t1), file(item.wmparc), file(item.aparc_aseg)]
         }
-        .groupTuple()
-        .map {
-            validateInputSamplesheet(it)
-        }
-        .map {
-            meta, fastqs ->
-                return [ meta, fastqs.flatten() ]
-        }
-        .set { ch_samplesheet }
+    }
+
+    ch_samplesheet = ch_samplesheet.mix(ch_input_sheets.raw)
 
     emit:
     samplesheet = ch_samplesheet
