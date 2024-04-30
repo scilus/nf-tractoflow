@@ -4,19 +4,30 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { MULTIQC                 } from '../modules/nf-core/multiqc/main'
-include { paramsSummaryMap        } from 'plugin/nf-validation'
-include { paramsSummaryMultiqc    } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { softwareVersionsToYAML  } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { methodsDescriptionText  } from '../subworkflows/local/utils_nfcore_tractoflow_pipeline'
+include {   MULTIQC                 } from '../modules/nf-core/multiqc/main'
+include {   paramsSummaryMap        } from 'plugin/nf-validation'
+include {   paramsSummaryMultiqc    } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include {   softwareVersionsToYAML  } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include {   methodsDescriptionText  } from '../subworkflows/local/utils_nfcore_tractoflow_pipeline'
 
 // PREPROCESSING
-include { PREPROC_DWI                                              } from '../subworkflows/nf-scil/preproc_dwi/main'
-include { PREPROC_T1                                               } from '../subworkflows/nf-scil/preproc_t1/main'
-include { RECONST_DTIMETRICS as REGISTRATION_FA                    } from '../modules/nf-scil/reconst/dtimetrics/main'
-include { REGISTRATION as T1_REGISTRATION                          } from '../subworkflows/nf-scil/registration/main'
-include { REGISTRATION_ANTSAPPLYTRANSFORMS as TRANSFORM_FREESURFER } from '../modules/nf-scil/registration/antsapplytransforms/main'
-include { ANATOMICAL_SEGMENTATION                                  } from '../subworkflows/nf-scil/anatomical_segmentation/main'
+include {   PREPROC_DWI                                               } from '../subworkflows/nf-scil/preproc_dwi/main'
+include {   PREPROC_T1                                                } from '../subworkflows/nf-scil/preproc_t1/main'
+include {   RECONST_DTIMETRICS as REGISTRATION_FA                     } from '../modules/nf-scil/reconst/dtimetrics/main'
+include {   REGISTRATION as T1_REGISTRATION                           } from '../subworkflows/nf-scil/registration/main'
+include {   REGISTRATION_ANTSAPPLYTRANSFORMS as TRANSFORM_WMPARC;
+            REGISTRATION_ANTSAPPLYTRANSFORMS as TRANSFORM_APARC_ASEG } from '../modules/nf-scil/registration/antsapplytransforms/main'
+include {   ANATOMICAL_SEGMENTATION                                  } from '../subworkflows/nf-scil/anatomical_segmentation/main'
+
+// RECONSTRUCTION
+include {   RECONST_FRF        } from '../modules/nf-scil/reconst/frf/main'
+include {   RECONST_MEANFRF    } from '../modules/nf-scil/reconst/meanfrf/main'
+include {   RECONST_DTIMETRICS } from '../modules/nf-scil/reconst/dtimetrics/main'
+include {   RECONST_FODF       } from '../modules/nf-scil/reconst/fodf/main'
+
+// TRACKING
+include { TRACKING_PFTTRACKING } from '../modules/nf-scil/tracking/pfttracking/main'
+include { TRACKING_LOCALTRACKING } from '../modules/nf-scil/tracking/localtracking/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -39,8 +50,8 @@ workflow TRACTOFLOW {
     ch_samplesheet.view()
 
     /* Load topup config if provided */
-    if ( params.topup_config ) ch_topup_config = Channel.fromPath(
-        params.topup_config, checkIfExists: true)
+    if ( params.topup_config ) ch_topup_config = Channel
+        .fromPath(params.topup_config, checkIfExists: true)
 
     /* Load bet template */
     ch_bet_template = Channel.fromPath(params.t1_bet_template, checkIfExists: true)
@@ -54,8 +65,11 @@ workflow TRACTOFLOW {
             rev_dwi: [[id: id], rev_dwi, rev_bval, rev_bvec],
             rev_sbref: [[id: id], rev_sbref],
             t1: [[id: id], t1],
-            parc: [[id: id], wmparc, aparc_aseg]
+            wmparc: [[id: id], wmparc]
+            aparc_aseg: [[id: id], aparc_aseg]
         }
+
+    /* PREPROCESSING */
 
     //
     // SUBWORKFLOW: Run PREPROC_DWI
@@ -84,9 +98,7 @@ workflow TRACTOFLOW {
         .join(PREPROC_DWI.out.bvec)
         .join(PREPROC_DWI.out.b0_mask)
 
-    REGISTRATION_FA(
-        ch_registration_fa
-    )
+    REGISTRATION_FA( ch_registration_fa )
 
     //
     // SUBWORKFLOW: Run REGISTRATION
@@ -98,11 +110,22 @@ workflow TRACTOFLOW {
         []
     )
 
-    //
-    // MODULE: Run REGISTRATION_ANTSAPPLYTRANSFORMS (TRANSFORM_FREESURFER)
-    //
+    /* SEGMENTATION */
 
-    TRANSFORM_FREESURFER(
+    //
+    // MODULE: Run REGISTRATION_ANTSAPPLYTRANSFORMS (TRANSFORM_WMPARC)
+    //
+    TRANSFORM_WMPARC(
+        ch_inputs.wmparc,
+        PREPROC_DWI.out.b0,
+        T1_REGISTRATION.out.transfo_image
+    )
+
+    //
+    // MODULE: Run REGISTRATION_ANTSAPPLYTRANSFORMS (TRANSFORM_APARC_ASEG)
+    //
+    TRANSFORM_APARC_ASEG(
+        ch_inputs.aparc_aseg,
         PREPROC_DWI.out.b0,
         T1_REGISTRATION.out.transfo_image
     )
@@ -112,8 +135,69 @@ workflow TRACTOFLOW {
     //
     ANATOMICAL_SEGMENTATION(
         T1_REGISTRATION.out.image_warped,
-        ch_inputs.parc
+        TRANSFORM_WMPARC.out.warped
+            .join(TRANSFORM_APARC_ASEG.out.warped)
     )
+
+    /* RECONSTRUCTION */
+
+    //
+    // MODULE: Run RECONST/DTIMETRICS
+    //
+    ch_dti_metrics = PREPROC_DWI.out.dwi_resample
+        .join(PREPROC_DWI.out.bval)
+        .join(PREPROC_DWI.out.bvec)
+        .join(PREPROC_DWI.out.b0_mask)
+
+    RECONST_DTIMETRICS( ch_dti_metrics )
+
+    //
+    // MODULE: Run RECONST/FRF
+    //
+    ch_reconst_frf = PREPROC_DWI.out.dwi_resample
+        .join(PREPROC_DWI.out.bval)
+        .join(PREPROC_DWI.out.bvec)
+        .join(PREPROC_DWI.out.b0_mask)
+
+    RECONST_FRF( ch_reconst_frf )
+
+    /* Run fiber response aeraging over subjects */
+    ch_fiber_response = RECONST_FRF.out.frf
+    if (params.average_fiber_response ) {
+        RECONST_MEANFRF( RECONST_FRF.out.frf.map{ it[1] }.flatten() )
+        ch_fiber_response = RECONST_FRF.out.map{ it[0] }
+            .combine( RECONST_MEANFRF.out.meanfrf )
+    }
+
+    //
+    // MODULE: Run RECONST/FODF
+    //
+    ch_reconst_fodf = PREPROC_DWI.out.dwi_resample
+        .join(PREPROC_DWI.out.bval)
+        .join(PREPROC_DWI.out.bvec)
+        .join(PREPROC_DWI.out.b0_mask)
+        .join(RECONST_DTIMETRICS.out.fa)
+        .join(RECONST_DTIMETRICS.ou.md)
+        .join(ch_fiber_response)
+    RECONST_FODF( ch_reconst_fodf )
+
+    //
+    // MODULE: Run TRACKING/PFTTRACKING
+    //
+    ch_pft_tracking = ANATOMICAL_SEGMENTATION.out.wm_mask
+        .join(ANATOMICAL_SEGMENTATION.out.gm_mask)
+        .join(ANATOMICAL_SEGMENTATION.out.csf_mask)
+        .join(RECONST_FODF.out.fodf)
+        .join(RECONST_DTIMETRICS.out.fa)
+    TRACKING_PFTTRACKING( ch_pft_tracking )
+
+    //
+    // MODULE: Run TRACKING/LOCALTRACKING
+    //
+    ch_local_tracking = ANATOMICAL_SEGMENTATION.out.wm_mask
+        .join(RECONST_FODF.out.fodf)
+        .join(RECONST_DTIMETRICS.out.fa)
+    TRACKING_LOCALTRACKING( ch_local_tracking )
 
     //
     // Collate and save software versions

@@ -100,6 +100,21 @@
                         "git_sha": "317f9f98b9b1faa93e72ff61560bb765d6fdc364",
                         "installed_by": ["modules"]
                     },
+                    "reconst/fodf": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "62979e1455a723b1f1a149a4353cbcc2dcd318ba",
+                        "installed_by": ["modules"]
+                    },
+                    "reconst/frf": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "317f9f98b9b1faa93e72ff61560bb765d6fdc364",
+                        "installed_by": ["modules"]
+                    },
+                    "reconst/meanfrf": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "317f9f98b9b1faa93e72ff61560bb765d6fdc364",
+                        "installed_by": ["modules"]
+                    },
                     "register/anattodwi": {
                         "branch": "review/alex_preproc_dwi",
                         "git_sha": "317f9f98b9b1faa93e72ff61560bb765d6fdc364",
@@ -124,6 +139,16 @@
                         "branch": "review/alex_preproc_dwi",
                         "git_sha": "62979e1455a723b1f1a149a4353cbcc2dcd318ba",
                         "installed_by": ["anatomical_segmentation"]
+                    },
+                    "tracking/localtracking": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "62979e1455a723b1f1a149a4353cbcc2dcd318ba",
+                        "installed_by": ["modules"]
+                    },
+                    "tracking/pfttracking": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "317f9f98b9b1faa93e72ff61560bb765d6fdc364",
+                        "installed_by": ["modules"]
                     },
                     "utils/extractb0": {
                         "branch": "review/alex_preproc_dwi",
