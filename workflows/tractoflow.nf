@@ -5,7 +5,7 @@
 */
 
 include {   MULTIQC                 } from '../modules/nf-core/multiqc/main'
-include {   paramsSummaryMap        } from 'plugin/nf-validation'
+include {   paramsSummaryMap        } from 'plugin/nf-schema'
 include {   paramsSummaryMultiqc    } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include {   softwareVersionsToYAML  } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include {   methodsDescriptionText  } from '../subworkflows/local/utils_nfcore_tractoflow_pipeline'
@@ -15,9 +15,9 @@ include {   PREPROC_DWI                                               } from '..
 include {   PREPROC_T1                                                } from '../subworkflows/nf-scil/preproc_t1/main'
 include {   RECONST_DTIMETRICS as REGISTRATION_FA                     } from '../modules/nf-scil/reconst/dtimetrics/main'
 include {   REGISTRATION as T1_REGISTRATION                           } from '../subworkflows/nf-scil/registration/main'
-include {   REGISTRATION_ANTSAPPLYTRANSFORMS as TRANSFORM_WMPARC;
-            REGISTRATION_ANTSAPPLYTRANSFORMS as TRANSFORM_APARC_ASEG } from '../modules/nf-scil/registration/antsapplytransforms/main'
-include {   ANATOMICAL_SEGMENTATION                                  } from '../subworkflows/nf-scil/anatomical_segmentation/main'
+include {   REGISTRATION_ANTSAPPLYTRANSFORMS as TRANSFORM_WMPARC      } from '../modules/nf-scil/registration/antsapplytransforms/main'
+include {   REGISTRATION_ANTSAPPLYTRANSFORMS as TRANSFORM_APARC_ASEG  } from '../modules/nf-scil/registration/antsapplytransforms/main'
+include {   ANATOMICAL_SEGMENTATION                                   } from '../subworkflows/nf-scil/anatomical_segmentation/main'
 
 // RECONSTRUCTION
 include {   RECONST_FRF        } from '../modules/nf-scil/reconst/frf/main'
@@ -50,8 +50,7 @@ workflow TRACTOFLOW {
     ch_samplesheet.view()
 
     /* Load topup config if provided */
-    if ( params.topup_config ) ch_topup_config = Channel
-        .fromPath(params.topup_config, checkIfExists: true)
+    if ( params.topup_config ) ch_topup_config = Channel.fromPath(params.topup_config, checkIfExists: true)
 
     /* Load bet template */
     ch_bet_template = Channel.fromPath(params.t1_bet_template, checkIfExists: true)
@@ -60,11 +59,11 @@ workflow TRACTOFLOW {
     /* Unpack inputs */
     ch_inputs = ch_samplesheet
         .multiMap{ id, dwi, bval, bvec, sbref, rev_dwi, rev_bval, rev_bvec, rev_sbref, t1, wmparc, aparc_aseg ->
-            dwi: [[id: id], dwi, bval, bvec],
-            sbref: [[id: id], sbref],
-            rev_dwi: [[id: id], rev_dwi, rev_bval, rev_bvec],
-            rev_sbref: [[id: id], rev_sbref],
-            t1: [[id: id], t1],
+            dwi: [[id: id], dwi, bval, bvec]
+            sbref: [[id: id], sbref]
+            rev_dwi: [[id: id], rev_dwi, rev_bval, rev_bvec]
+            rev_sbref: [[id: id], rev_sbref]
+            t1: [[id: id], t1]
             wmparc: [[id: id], wmparc]
             aparc_aseg: [[id: id], aparc_aseg]
         }
@@ -163,7 +162,7 @@ workflow TRACTOFLOW {
 
     /* Run fiber response aeraging over subjects */
     ch_fiber_response = RECONST_FRF.out.frf
-    if (params.average_fiber_response ) {
+    if ( params.average_fiber_response ) {
         RECONST_MEANFRF( RECONST_FRF.out.frf.map{ it[1] }.flatten() )
         ch_fiber_response = RECONST_FRF.out.map{ it[0] }
             .combine( RECONST_MEANFRF.out.meanfrf )
