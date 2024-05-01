@@ -22,7 +22,7 @@ include { imNotification            } from '../../nf-core/utils_nfcore_pipeline'
 include { UTILS_NFCORE_PIPELINE     } from '../../nf-core/utils_nfcore_pipeline'
 include { workflowCitation          } from '../../nf-core/utils_nfcore_pipeline'
 
-include { IO_READBIDS               } from '../modules/nf-scil/io/readbids/main'
+include { IO_READBIDS               } from '../../../modules/nf-scil/io/readbids/main'
 
 /*
 ========================================================================================

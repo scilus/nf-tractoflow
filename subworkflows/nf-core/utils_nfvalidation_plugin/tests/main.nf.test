@@ -6,7 +6,7 @@ nextflow_workflow {
     tag "subworkflows"
     tag "subworkflows_nfcore"
     tag "plugin/nf-validation"
-    tag "'plugin/nf-validation'"
+    tag "plugin/nf-schema"
     tag "utils_nfvalidation_plugin"
     tag "subworkflows/utils_nfvalidation_plugin"
 
