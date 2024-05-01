@@ -19,7 +19,7 @@ process REGISTRATION_ANTSAPPLYTRANSFORMS {
     script:
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
-    def suffix = task.ext.fist_suffix ? "${task.ext.fist_suffix}_warped" : "warped"
+    def suffix = task.ext.first_suffix ? "${task.ext.first_suffix}_warped" : "warped"
 
     def dimensionality = task.ext.dimensionality ? "-d " + task.ext.dimensionality : ""
     def image_type = task.ext.image_type ? "-e " + task.ext.image_type : ""
@@ -44,6 +44,7 @@ process REGISTRATION_ANTSAPPLYTRANSFORMS {
     stub:
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
+    def suffix = task.ext.first_suffix ? "${task.ext.first_suffix}_warped" : "warped"
 
     def dimensionality = task.ext.dimensionality ? "-d " + task.ext.dimensionality : ""
     def image_type = task.ext.image_type ? "-e " + task.ext.image_type : ""
@@ -54,7 +55,7 @@ process REGISTRATION_ANTSAPPLYTRANSFORMS {
     """
     antsApplyTransforms -h
 
-    touch ${prefix}__warped_image.nii.gz
+    touch ${prefix}__${suffix}.nii.gz
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
