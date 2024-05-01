@@ -12,7 +12,7 @@ import groovy.json.*
 
 include { UTILS_NFVALIDATION_PLUGIN } from '../../nf-core/utils_nfvalidation_plugin'
 include { paramsSummaryMap          } from 'plugin/nf-validation'
-include { samplesheetToList         } from 'plugin/nf-schema'
+include { fromSamplesheet           } from 'plugin/nf-validation'
 include { UTILS_NEXTFLOW_PIPELINE   } from '../../nf-core/utils_nextflow_pipeline'
 include { completionEmail           } from '../../nf-core/utils_nfcore_pipeline'
 include { completionSummary         } from '../../nf-core/utils_nfcore_pipeline'
@@ -81,7 +81,8 @@ workflow PIPELINE_INITIALISATION {
     // Create channel from input file provided through params.input
     //
     ch_input_sheets = Channel
-        .fromList(samplesheetToList(params.input, "assets/schema_input.json"))
+        .fromSamplesheet("input", "assets/schema_input.json")
+        .map{ validateInputSamplesheet(it) }
         .branch {
             bids: it.size() == 4
             raw: true
