@@ -358,7 +358,6 @@
             "title": "T1 preprocessing options",
             "type": "object",
             "description": "",
-            "default": "",
             "properties": {
                 "t1_filter_noise": {
                     "type": "boolean",
@@ -383,7 +382,6 @@
             "title": "Resampling options",
             "type": "object",
             "description": "",
-            "default": "",
             "properties": {
                 "dwi_resample_spatial": {
                     "type": "boolean",
@@ -435,7 +433,6 @@
             "title": "DWI processing options",
             "type": "object",
             "description": "",
-            "default": "",
             "properties": {
                 "dwi_fit_signal_sh": {
                     "type": "boolean",
@@ -561,7 +558,6 @@
             "title": "Particle Filtering Tractography options",
             "type": "object",
             "description": "",
-            "default": "",
             "properties": {
                 "fodf_fit_pft": {
                     "type": "boolean",
@@ -687,7 +683,6 @@
             "title": "Local Tractography options",
             "type": "object",
             "description": "",
-            "default": "",
             "properties": {
                 "fodf_fit_local": {
                     "type": "boolean",
