@@ -1,7 +1,7 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "https://raw.githubusercontent.com/nf/tractoflow/master/nextflow_schema.json",
-    "title": "nf/tractoflow pipeline parameters",
+    "$id": "https://raw.githubusercontent.com/AlexVCaron/nf-tractoflow/master/nextflow_schema.json",
+    "title": "AlexVCaron/nf-tractoflow pipeline parameters",
     "description": "Human diffusion MRI processing and tractography",
     "type": "object",
     "definitions": {
@@ -21,7 +21,6 @@
                     "exists": true,
                     "schema": "assets/schema_input.json",
                     "mimetype": "text/csv",
-                    "pattern": "^\\S+\\.csv$",
                     "description": "Path to comma-separated file containing information about the samples in the experiment.",
                     "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row.",
                     "fa_icon": "fas fa-file-csv"
@@ -296,7 +295,6 @@
                 },
                 "dwi_filter_gibbs": {
                     "type": "boolean",
-                    "default": false,
                     "description": "Run Gibbs Ringing artifact filtering on the DWI (Mrtrix3 mrdegibbs)."
                 },
                 "dwi_filter_susceptibility": {
