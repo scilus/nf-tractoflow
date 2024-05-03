@@ -52,7 +52,8 @@ workflow PIPELINE_INITIALISATION {
         version,
         true,
         outdir,
-        workflow.profile.tokenize(',').intersect(['conda', 'mamba']).size() >= 1
+        false   // Reinstate when/if we use conda/mamba :
+                // workflow.profile.tokenize(',').intersect(['conda', 'mamba']).size() >= 1
     )
 
     //
@@ -88,7 +89,7 @@ workflow PIPELINE_INITIALISATION {
             raw: true
         }
 
-    IO_READBIDS ( ch_input_sheets.bids )
+    IO_READBIDS ( ch_input_sheets.bids.map{ it[1..-1] } )
     ch_versions = ch_versions.mix(IO_READBIDS.out.versions)
 
     ///
