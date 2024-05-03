@@ -6,13 +6,11 @@ process IO_READBIDS {
         'scilus/scilus:1.6.0' }"
 
     input:
-        path(bids_folder)
-        path(fsfolder)
-        path(bidsignore)
+        path(bids_folder), path(fsfolder), path(bidsignore)
 
     output:
         path("tractoflow_bids_struct.json"), emit: bids
-        path "versions.yml"                             , emit: versions
+        path "versions.yml"                , emit: versions
 
 
     when:
