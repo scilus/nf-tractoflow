@@ -266,8 +266,7 @@
         "dwi_preprocessing_options": {
             "title": "DWI preprocessing options",
             "type": "object",
-            "description": "",
-            "default": "",
+            "description": "All parameters related to DWI preprocessing.",
             "properties": {
                 "dwi_mask_prelim_bet_dilation_radius": {
                     "type": "integer",
@@ -357,7 +356,7 @@
         "t1_preprocessing_options": {
             "title": "T1 preprocessing options",
             "type": "object",
-            "description": "",
+            "description": "All parameters related to T1 preprocessing.",
             "properties": {
                 "t1_filter_noise": {
                     "type": "boolean",
@@ -381,7 +380,7 @@
         "resampling_options": {
             "title": "Resampling options",
             "type": "object",
-            "description": "",
+            "description": "Resampling options for DWI and anatomical volumes.",
             "properties": {
                 "dwi_resample_spatial": {
                     "type": "boolean",
@@ -432,7 +431,7 @@
         "dwi_processing_options": {
             "title": "DWI processing options",
             "type": "object",
-            "description": "",
+            "description": "All parameters related to DWI processing (SH, DTI, fODF).",
             "properties": {
                 "dwi_fit_signal_sh": {
                     "type": "boolean",
@@ -557,7 +556,7 @@
         "particle_filtering_tractography_options": {
             "title": "Particle Filtering Tractography options",
             "type": "object",
-            "description": "",
+            "description": "All parameters related to particle filtering tractography on fODF fields.",
             "properties": {
                 "fodf_fit_pft": {
                     "type": "boolean",
@@ -682,7 +681,7 @@
         "local_tractography_options": {
             "title": "Local Tractography options",
             "type": "object",
-            "description": "",
+            "description": "All parameters related to local tractography on fODF fields.",
             "properties": {
                 "fodf_fit_local": {
                     "type": "boolean",
