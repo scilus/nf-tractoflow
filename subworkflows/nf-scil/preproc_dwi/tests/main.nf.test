@@ -8,7 +8,7 @@ nextflow_workflow {
     tag "subworkflows"
     tag "subworkflows_nfcore"
     tag "subworkflows/preproc_dwi"
-
+    tag "subworkflows/topup_eddy"
     tag "betcrop/cropvolume"
     tag "betcrop/fslbetcrop"
     tag "denoising/mppca"
@@ -20,38 +20,23 @@ nextflow_workflow {
 
     tag "load_test_data"
 
-    /*setup {
+    setup {
         run("LOAD_TEST_DATA", alias: "LOAD_DATA") {
             script "../../load_test_data/main.nf"
             process {
                 """
-                input[0] = Channel.from( [ "topup_eddy.zip" ] )
+                input[0] = Channel.from( [ "topup_eddy_light.zip" ] )
                 input[1] = "test.load-test-data"
                 """
             }
         }
-    }*/
+    }
 
     test("preproc_dwi_rev_b0") {
 
         when {
             workflow {
                 """
-                input[0] = Channel.from([[
-                    [ id:'sub-01', single_end:false ],
-                    file("/workspaces/topup_eddy_light/sub-01_dir-AP_dwi.nii.gz"),
-                    file("/workspaces/topup_eddy_light/sub-01_dir-AP_dwi.bval"),
-                    file("/workspaces/topup_eddy_light/sub-01_dir-AP_dwi.bvec")
-                ]]).view()
-                input[1] = []
-                input[2] = []
-                input[3] = Channel.from([[
-                    [ id:'sub-01', single_end:false ],
-                    file("/workspaces/topup_eddy_light/sub-01_dir-PA_sbref.nii.gz")
-                ]]).view()
-                input[4] = []
-                """
-                /*"""
                 input[0] = LOAD_DATA.out.test_data_directory.map{
                     test_data_directory -> [
                         [ id:'test', single_end:false ],
@@ -67,19 +52,28 @@ nextflow_workflow {
                         file("\${test_data_directory}/sub-01_dir-PA_sbref.nii.gz")
                     ]}
                 input[4] = []
-                """*/
+                """
             }
         }
 
         then {
             assertAll(
                 { assert workflow.success},
-                { assert snapshot(workflow.out).match()}
+                { assert snapshot(
+                    workflow.out.bval,
+                    workflow.out.versions,
+                    file(workflow.out.b0.get(0).get(1)).name,
+                    file(workflow.out.b0_mask.get(0).get(1)).name,
+                    file(workflow.out.bvec.get(0).get(1)).name,
+                    file(workflow.out.dwi_bounding_box.get(0).get(1)).name,
+                    file(workflow.out.dwi_n4.get(0).get(1)).name,
+                    file(workflow.out.dwi_resample.get(0).get(1)).name,
+                    file(workflow.out.dwi_topup_eddy.get(0).get(1)).name).match() }
             )
         }
     }
 
-    /*test("preproc_dwi_rev_dwi_nob0") {
+    test("preproc_dwi_rev_dwi_nob0") {
 
         when {
             workflow {
@@ -108,7 +102,16 @@ nextflow_workflow {
         then {
             assertAll(
                 { assert workflow.success},
-                { assert snapshot(workflow.out).match()}
+                { assert snapshot(
+                    workflow.out.bval,
+                    workflow.out.versions,
+                    file(workflow.out.b0.get(0).get(1)).name,
+                    file(workflow.out.b0_mask.get(0).get(1)).name,
+                    file(workflow.out.bvec.get(0).get(1)).name,
+                    file(workflow.out.dwi_bounding_box.get(0).get(1)).name,
+                    file(workflow.out.dwi_n4.get(0).get(1)).name,
+                    file(workflow.out.dwi_resample.get(0).get(1)).name,
+                    file(workflow.out.dwi_topup_eddy.get(0).get(1)).name).match() }
             )
         }
     }
@@ -151,8 +154,17 @@ nextflow_workflow {
         then {
             assertAll(
                 { assert workflow.success},
-                { assert snapshot(workflow.out).match()}
+                { assert snapshot(
+                    workflow.out.bval,
+                    workflow.out.versions,
+                    file(workflow.out.b0.get(0).get(1)).name,
+                    file(workflow.out.b0_mask.get(0).get(1)).name,
+                    file(workflow.out.bvec.get(0).get(1)).name,
+                    file(workflow.out.dwi_bounding_box.get(0).get(1)).name,
+                    file(workflow.out.dwi_n4.get(0).get(1)).name,
+                    file(workflow.out.dwi_resample.get(0).get(1)).name,
+                    file(workflow.out.dwi_topup_eddy.get(0).get(1)).name).match() }
             )
         }
-    }*/
+    }
 }

@@ -5,11 +5,6 @@
         "https://github.com/nf-core/modules.git": {
             "modules": {
                 "nf-core": {
-                    "fastqc": {
-                        "branch": "master",
-                        "git_sha": "f4ae1d942bd50c5c0b9bd2de1393ce38315ba57c",
-                        "installed_by": ["modules"]
-                    },
                     "multiqc": {
                         "branch": "master",
                         "git_sha": "b7ebe95761cd389603f9cc0e0dc384c0f663815a",
@@ -26,7 +21,7 @@
                     },
                     "utils_nfcore_pipeline": {
                         "branch": "master",
-                        "git_sha": "5caf7640a9ef1d18d765d55339be751bb0969dfa",
+                        "git_sha": "92de218a329bfc9a9033116eb5f65fd270e72ba3",
                         "installed_by": ["subworkflows"]
                     },
                     "utils_nfvalidation_plugin": {
@@ -68,7 +63,7 @@
                     "image/resample": {
                         "branch": "review/alex_preproc_dwi",
                         "git_sha": "85eebbc9e881e1ac930a22ceada63c44c099e1d3",
-                        "installed_by": ["preproc_t1"]
+                        "installed_by": ["preproc_t1", "preproc_dwi"]
                     },
                     "io/readbids": {
                         "branch": "review/alex_preproc_dwi",
@@ -76,8 +71,8 @@
                         "installed_by": ["modules"]
                     },
                     "preproc/eddy": {
-                        "branch": "review/alex_preproc_dwi",
-                        "git_sha": "34ab56fc5bcd2745f99c9b56c96b614e39c2f3bc",
+                        "branch": "main",
+                        "git_sha": "a275f58196407fb05d4d9730ca781f584b00048c",
                         "installed_by": ["topup_eddy"]
                     },
                     "preproc/n4": {
@@ -91,8 +86,8 @@
                         "installed_by": ["preproc_dwi"]
                     },
                     "preproc/topup": {
-                        "branch": "review/alex_preproc_dwi",
-                        "git_sha": "5faed0ec2aa8007b3abfd6d385ff8fa8e6141893",
+                        "branch": "main",
+                        "git_sha": "8863c9b6f0757b9c41920b5222d10d2c580009d2",
                         "installed_by": ["topup_eddy"]
                     },
                     "reconst/dtimetrics": {
@@ -153,7 +148,7 @@
                     "utils/extractb0": {
                         "branch": "review/alex_preproc_dwi",
                         "git_sha": "317f9f98b9b1faa93e72ff61560bb765d6fdc364",
-                        "installed_by": ["topup_eddy"]
+                        "installed_by": ["topup_eddy", "preproc_dwi"]
                     }
                 }
             },
@@ -165,8 +160,8 @@
                         "installed_by": ["subworkflows"]
                     },
                     "preproc_dwi": {
-                        "branch": "review/alex_preproc_dwi",
-                        "git_sha": "03dacc58f42ef75764bcd74a0bbb6e4709e38796",
+                        "branch": "main",
+                        "git_sha": "455be4fdaff99dcb1d81f8adff17da933f71cc87",
                         "installed_by": ["subworkflows"]
                     },
                     "preproc_t1": {
@@ -180,8 +175,8 @@
                         "installed_by": ["subworkflows"]
                     },
                     "topup_eddy": {
-                        "branch": "review/alex_preproc_dwi",
-                        "git_sha": "34ab56fc5bcd2745f99c9b56c96b614e39c2f3bc",
+                        "branch": "main",
+                        "git_sha": "7543d392b565b1a56885c813dd3c896163ce8fcc",
                         "installed_by": ["preproc_dwi"]
                     }
                 }

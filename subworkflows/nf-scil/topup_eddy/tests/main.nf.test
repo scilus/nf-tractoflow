@@ -21,7 +21,7 @@ nextflow_workflow {
             script "../../load_test_data/main.nf"
             process {
                 """
-                input[0] = Channel.from( [ "topup_eddy.zip" ] )
+                input[0] = Channel.from( [ "topup_eddy_light.zip" ] )
                 input[1] = "test.load-test-data"
                 """
             }

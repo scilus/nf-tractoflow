@@ -1,11 +1,10 @@
-
 process PREPROC_TOPUP {
     tag "$meta.id"
     label 'process_single'
 
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://scil.usherbrooke.ca/containers/scilus_1.6.0.sif':
-        'scilus/scilus:1.6.0' }"
+        "https://scil.usherbrooke.ca/containers/scilus_2.0.0.sif":
+        "scilus/scilus:2.0.0"}"
 
     input:
         tuple val(meta), path(dwi), path(bval), path(bvec), path(b0), path(rev_dwi), path(rev_bval), path(rev_bvec), path(rev_b0)
@@ -40,23 +39,23 @@ process PREPROC_TOPUP {
 
     if [[ -f "$b0" ]];
     then
-        scil_image_math.py concatenate $b0 $b0 ${prefix}__concatenated_b0.nii.gz
-        scil_image_math.py mean ${prefix}__concatenated_b0.nii.gz ${prefix}__b0_mean.nii.gz
+        scil_volume_math.py concatenate $b0 $b0 ${prefix}__concatenated_b0.nii.gz
+        scil_volume_math.py mean ${prefix}__concatenated_b0.nii.gz ${prefix}__b0_mean.nii.gz
     else
-        scil_extract_b0.py $dwi $bval $bvec ${prefix}__b0_mean.nii.gz --mean --b0_thr $b0_thr_extract_b0 --force_b0_threshold
+        scil_dwi_extract_b0.py $dwi $bval $bvec ${prefix}__b0_mean.nii.gz --mean --b0_threshold $b0_thr_extract_b0 --skip_b0_check
     fi
 
     if [[ -f "$rev_b0" ]];
     then
-        scil_image_math.py concatenate $rev_b0 $rev_b0 ${prefix}__concatenated_rev_b0.nii.gz
-        scil_image_math.py mean ${prefix}__concatenated_rev_b0.nii.gz ${prefix}__rev_b0_mean.nii.gz
+        scil_volume_math.py concatenate $rev_b0 $rev_b0 ${prefix}__concatenated_rev_b0.nii.gz
+        scil_volume_math.py mean ${prefix}__concatenated_rev_b0.nii.gz ${prefix}__rev_b0_mean.nii.gz
     else
-        scil_extract_b0.py $rev_dwi $rev_bval $rev_bvec ${prefix}__rev_b0_mean.nii.gz --mean --b0_thr $b0_thr_extract_b0 --force_b0_threshold
+        scil_dwi_extract_b0.py $rev_dwi $rev_bval $rev_bvec ${prefix}__rev_b0_mean.nii.gz --mean --b0_threshold $b0_thr_extract_b0 --skip_b0_check
     fi
 
     antsRegistrationSyNQuick.sh -d 3 -f ${prefix}__b0_mean.nii.gz -m ${prefix}__rev_b0_mean.nii.gz -o output -t r -e 1
     mv outputWarped.nii.gz ${prefix}__rev_b0_warped.nii.gz
-    scil_prepare_topup_command.py ${prefix}__b0_mean.nii.gz ${prefix}__rev_b0_warped.nii.gz\
+    scil_dwi_prepare_topup_command.py ${prefix}__b0_mean.nii.gz ${prefix}__rev_b0_warped.nii.gz\
         --config $config_topup\
         --encoding_direction $encoding\
         --readout $readout --out_prefix $prefix_topup\
@@ -66,7 +65,7 @@ process PREPROC_TOPUP {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        scilpy: 1.6.0
+        scilpy: 2.0.0
         antsRegistration: 2.4.3
         fsl: \$(flirt -version 2>&1 | sed -n 's/FLIRT version \\([0-9.]\\+\\)/\\1/p')
 
@@ -78,10 +77,10 @@ process PREPROC_TOPUP {
     def prefix = task.ext.prefix ?: "${meta.id}"
 
     """
-    scil_image_math.py -h
-    scil_extract_b0.py -h
+    scil_volume_math.py -h
+    scil_dwi_extract_b0.py -h
     antsRegistrationSyNQuick.sh -h
-    scil_prepare_topup_command.py -h
+    scil_dwi_prepare_topup_command.py -h
 
     touch ${prefix}__corrected_b0s.nii.gz
     touch ${prefix}__rev_b0_warped.nii.gz
@@ -92,7 +91,7 @@ process PREPROC_TOPUP {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        scilpy: 1.6.0
+        scilpy: 2.0.0
         antsRegistration: 2.4.3
         fsl: \$(flirt -version 2>&1 | sed -n 's/FLIRT version \\([0-9.]\\+\\)/\\1/p')
 
