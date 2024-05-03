@@ -29,7 +29,7 @@
                 "dwi_shell_extract_tolerance": {
                     "type": "integer",
                     "default": 20,
-                    "description": "Consider all b-values up to +-tolerance as belonging to the same shell",
+                    "description": "Consider all b-values up to +-tolerance as belonging to the same shell.",
                     "minimum": 0
                 },
                 "dwi_b0_extract_threshold": {
@@ -296,6 +296,7 @@
                 },
                 "dwi_filter_gibbs": {
                     "type": "boolean",
+                    "default": false,
                     "description": "Run Gibbs Ringing artifact filtering on the DWI (Mrtrix3 mrdegibbs)."
                 },
                 "dwi_filter_susceptibility": {
@@ -363,6 +364,7 @@
             "properties": {
                 "t1_filter_noise": {
                     "type": "boolean",
+                    "default": true,
                     "description": "Run background noise filtering on the T1 (Dipy NL-Means)"
                 },
                 "t1_tissue_segment_n_classes": {
@@ -391,7 +393,7 @@
                     "description": "Resample DWI volumes to a finer isotropic spatial resolution before processing."
                 },
                 "dwi_spatial_resample_resolution": {
-                    "type": "integer",
+                    "type": "number",
                     "default": 1,
                     "description": "Isotropic spatial resolution for DWI resampling.",
                     "minimum": 0
@@ -413,7 +415,7 @@
                     "description": "Resample T1 volumes to a finer isotropic spatial resolution before processing."
                 },
                 "t1_spatial_resample_resolution": {
-                    "type": "integer",
+                    "type": "number",
                     "default": 1,
                     "description": "Isotropic spatial resolution for T1 resampling.",
                     "minimum": 0
@@ -439,6 +441,7 @@
             "properties": {
                 "dwi_fit_signal_sh": {
                     "type": "boolean",
+                    "default": true,
                     "description": "Compute a Spherical Harmonics fit on the DWI, and output the SH coefficients in a Nifti file."
                 },
                 "dwi_signal_sh_fit_basis": {
@@ -473,7 +476,7 @@
                 "dwi_fodf_fit_shell_min_bvalue": {
                     "type": "integer",
                     "default": 700,
-                    "description": "Minimum b-value considered for fODF fit (b0 shells will be preserved).",
+                    "description": "Minimum b-value considered for fODF fit (b0 shell will be preserved).",
                     "minimum": 0
                 },
                 "dwi_fodf_fit_shells": {
@@ -503,7 +506,7 @@
                 "dwi_fodf_fit_frf_roi_radius": {
                     "type": "integer",
                     "default": 20,
-                    "description": "Region of interest to use to compute the fiber response function."
+                    "description": "Isotropic radius of the Region Of Interest to use to compute the fiber response function."
                 },
                 "dwi_fodf_fit_force_frf": {
                     "type": "string",
@@ -565,12 +568,13 @@
                 "fodf_fit_pft": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Run Particle Filtering Tractography (PFT)"
+                    "description": "Run Particle Filtering Tractography (PFT)."
                 },
                 "fodf_pft_fit_random_seed": {
                     "type": "integer",
                     "default": 0,
-                    "description": "List of seed numbers for the random number generator."
+                    "description": "List of seed numbers for the random number generator. List them through command line using a whitespace separated list of seeds.",
+                    "minimum": 0
                 },
                 "fodf_pft_fit_algorithm": {
                     "type": "string",
@@ -584,26 +588,26 @@
                 "fodf_pft_fit_step_size": {
                     "type": "number",
                     "default": 0.5,
-                    "description": "Length between steps for PFT.",
+                    "description": "Length between steps in mm.",
                     "minimum": 0
                 },
                 "fodf_pft_fit_theta_max_deviation": {
                     "type": "number",
                     "default": 20,
-                    "description": "Maximum angular deviation between steps for PFT",
+                    "description": "Maximum angular deviation between steps in degrees.",
                     "minimum": 0,
                     "maximum": 360
                 },
                 "fodf_pft_fit_streamline_min_length": {
                     "type": "number",
                     "default": 20,
-                    "description": "Minimum streamline length for PFT.",
+                    "description": "Minimum streamline length in mm.",
                     "minimum": 0
                 },
                 "fodf_pft_fit_streamline_max_length": {
                     "type": "number",
                     "default": 200,
-                    "description": "Maximum streamline length for PFT.",
+                    "description": "Maximum streamline length in mm.",
                     "minimum": 0
                 },
                 "fodf_pft_fit_seeding_type": {
@@ -628,41 +632,45 @@
                 "fodf_pft_fit_seeding_n_seeds": {
                     "type": "integer",
                     "default": 10,
-                    "description": "PFT number of seeds to use, given the seeding strategy.",
+                    "description": "Number of seeds to use, given the seeding strategy.",
                     "minimum": 1
                 },
                 "fodf_pft_fit_seeding_fa_mask_threshold": {
                     "type": "number",
                     "default": 0.1,
-                    "description": "Minimum FA threshold when using PFT with FA seeding.",
+                    "description": "Minimum FA threshold when seeding in FA.",
                     "minimum": 0,
                     "maximum": 1
                 },
                 "fodf_pft_fit_filter_n_particles": {
                     "type": "integer",
                     "default": 15,
-                    "description": "Number of particles propagated in case of premature terminaison.",
+                    "description": "Number of particles propagated in case of premature termination.",
                     "minimum": 1
                 },
                 "fodf_pft_fit_filter_backward_step_size": {
                     "type": "number",
                     "default": 2,
-                    "description": "Length of the backtracking steps of the particle filter.",
+                    "description": "Length of the backtracking steps of the particle filter in mm.",
                     "minimum": 0
                 },
                 "fodf_pft_fit_filter_forward_step_size": {
                     "type": "number",
                     "default": 1,
-                    "description": "Length of the forward tracking steps of the particle filter.",
+                    "description": "Length of the forward tracking steps of the particle filter in mm.",
                     "minimum": 0
                 },
                 "fodf_pft_fit_sf_threshold": {
                     "type": "number",
-                    "default": 0.1
+                    "default": 0.1,
+                    "description": "Threshold on spherical functions computed from fODF.",
+                    "minimum": 0
                 },
                 "fodf_pft_fit_sf_initial_threshold": {
                     "type": "number",
-                    "default": 0.5
+                    "default": 0.5,
+                    "description": "Initial threshold on spherical functions computed from fODF.",
+                    "minimum": 0
                 },
                 "fodf_pft_fit_compress_tractogram": {
                     "type": "boolean",
@@ -677,8 +685,8 @@
                 }
             }
         },
-        "new_group_1": {
-            "title": "New Group 1",
+        "local_tractography_options": {
+            "title": "Local Tractography options",
             "type": "object",
             "description": "",
             "default": "",
@@ -706,7 +714,8 @@
                 "fodf_local_fit_random_seed": {
                     "type": "integer",
                     "default": 0,
-                    "description": "List of seed numbers for the random number generator."
+                    "description": "List of seed numbers for the random number generator. List them through command line using a whitespace separated list of seeds.",
+                    "minimum": 0
                 },
                 "fodf_local_fit_algorithm": {
                     "type": "string",
@@ -720,26 +729,26 @@
                 "fodf_local_fit_step_size": {
                     "type": "number",
                     "default": 0.5,
-                    "description": "Length between tracking steps.",
+                    "description": "Length between tracking steps in mm.",
                     "minimum": 0
                 },
                 "fodf_local_fit_theta_max_deviation": {
                     "type": "number",
                     "default": 20,
-                    "description": "Maximum angular deviation between steps.",
+                    "description": "Maximum angular deviation between steps in degrees.",
                     "minimum": 0,
                     "maximum": 360
                 },
                 "fodf_local_fit_streamline_min_length": {
                     "type": "number",
                     "default": 20,
-                    "description": "Minimum streamline length.",
+                    "description": "Minimum streamline length in mm.",
                     "minimum": 0
                 },
                 "fodf_local_fit_streamline_max_length": {
                     "type": "number",
                     "default": 200,
-                    "description": "Maximum streamline length.",
+                    "description": "Maximum streamline length in mm.",
                     "minimum": 0
                 },
                 "fodf_local_fit_seeding_type": {
@@ -804,7 +813,8 @@
                 },
                 "fodf_local_fit_compress_tractogram": {
                     "type": "boolean",
-                    "default": true
+                    "default": true,
+                    "description": "Compress streamlines to save space."
                 },
                 "fodf_local_fit_compress_max_displacement": {
                     "type": "number",
@@ -844,7 +854,7 @@
             "$ref": "#/definitions/particle_filtering_tractography_options"
         },
         {
-            "$ref": "#/definitions/new_group_1"
+            "$ref": "#/definitions/local_tractography_options"
         }
     ],
     "properties": {
