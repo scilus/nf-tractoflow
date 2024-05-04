@@ -1,7 +1,7 @@
 
 process BETCROP_ANTSBET {
     tag "$meta.id"
-    label 'process_single'
+    label 'process_low'
 
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://scil.usherbrooke.ca/containers/scilus_1.6.0.sif':
@@ -23,14 +23,14 @@ process BETCROP_ANTSBET {
     def prefix = task.ext.prefix ?: "${meta.id}"
 
     """
-    export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
+    export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=$task.cpus
     export OMP_NUM_THREADS=1
     export OPENBLAS_NUM_THREADS=1
     export ANTS_RANDOM_SEED=1234
 
     antsBrainExtraction.sh -d 3 -a $t1 -e $template -o bet/ -m $tissues_probabilities -u 0
     scil_image_math.py convert bet/BrainExtractionMask.nii.gz ${prefix}__t1_bet_mask.nii.gz --data_type uint8
-    mrcalc $t1 ${prefix}__t1_bet_mask.nii.gz -mult ${prefix}__t1_bet.nii.gz -nthreads 1
+    mrcalc $t1 ${prefix}__t1_bet_mask.nii.gz -mult ${prefix}__t1_bet.nii.gz -nthreads $task.cpus
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

@@ -1,7 +1,7 @@
 
 process REGISTRATION_ANTS {
     tag "$meta.id"
-    label 'process_single'
+    label 'process_medium'
 
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://scil.usherbrooke.ca/containers/scilus_1.6.0.sif':
@@ -39,7 +39,7 @@ process REGISTRATION_ANTS {
     if ( task.ext.collapse_output ) args += " -z " + task.ext.collapse_output
 
     """
-    export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
+    export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=$task.cpus
     export OMP_NUM_THREADS=1
     export OPENBLAS_NUM_THREADS=1
 

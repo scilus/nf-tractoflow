@@ -2,7 +2,7 @@
 
 process REGISTER_ANATTODWI {
     tag "$meta.id"
-    label 'process_single'
+    label 'process_medium'
 
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://scil.usherbrooke.ca/containers/scilus_1.6.0.sif':
@@ -22,10 +22,9 @@ process REGISTER_ANATTODWI {
 
     script:
     def prefix = task.ext.prefix ?: "${meta.id}"
-    def cpus = task.ext.cpus ? "$task.ext.cpus" : "1"
 
     """
-    export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=$task.ext.cpus
+    export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=$task.cpus
     export OMP_NUM_THREADS=1
     export OPENBLAS_NUM_THREADS=1
     export ANTS_RANDOM_SEED=1234

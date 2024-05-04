@@ -1,6 +1,6 @@
 process PREPROC_N4 {
     tag "$meta.id"
-    label 'process_single'
+    label 'process_medium'
 
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://scil.usherbrooke.ca/containers/scilus_1.6.0.sif':
@@ -22,7 +22,7 @@ process PREPROC_N4 {
     def bspline_knot_per_voxel = task.ext.bspline_knot_per_voxel ? "$task.ext.bspline_knot_per_voxel" : "1"
     def shrink_factor = task.ext.shrink_factor ? "$task.ext.shrink_factor" : "1"
     """
-    export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
+    export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=$task.cpus
     export OMP_NUM_THREADS=1
     export OPENBLAS_NUM_THREADS=1
     export ANTS_RANDOM_SEED=1234

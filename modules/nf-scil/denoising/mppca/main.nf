@@ -1,7 +1,7 @@
 
 process DENOISING_MPPCA {
     tag "$meta.id"
-    label 'process_single'
+    label 'process_medium'
 
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://scil.usherbrooke.ca/containers/scilus_1.6.0.sif':
@@ -26,7 +26,7 @@ process DENOISING_MPPCA {
     export OMP_NUM_THREADS=1
     export OPENBLAS_NUM_THREADS=1
 
-    dwidenoise $dwi ${prefix}_dwi_denoised.nii.gz $extent -nthreads 1
+    dwidenoise $dwi ${prefix}_dwi_denoised.nii.gz $extent -nthreads $task.cpus
     fslmaths ${prefix}_dwi_denoised.nii.gz -thr 0 ${prefix}_dwi_denoised.nii.gz
 
     cat <<-END_VERSIONS > versions.yml
