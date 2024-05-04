@@ -21,22 +21,34 @@ workflow PREPROC_T1 {
         ch_versions = Channel.empty()
 
         // ** Denoising ** //
-        ch_nlmeans = ch_image.join(ch_mask_nlmeans)
+        ch_nlmeans = ch_image
+            .join(ch_mask_nlmeans, remainder: true)
+            .map{ it[0..1] + [it[2] ?: []] }
+
         DENOISING_NLMEANS ( ch_nlmeans )
         ch_versions = ch_versions.mix(DENOISING_NLMEANS.out.versions.first())
 
         // ** N4 correction ** //
-        ch_N4 = DENOISING_NLMEANS.out.image.join(ch_ref_n4)
+        ch_N4 = DENOISING_NLMEANS.out.image
+            .join(ch_ref_n4, remainder: true)
+            .map{ it[0..1] + [it[2] ?: []] }
+
         PREPROC_N4 ( ch_N4 )
         ch_versions = ch_versions.mix(PREPROC_N4.out.versions.first())
 
         // ** Resampling ** //
-        ch_resampling = PREPROC_N4.out.image.join(ch_ref_resample)
+        ch_resampling = PREPROC_N4.out.image
+            .join(ch_ref_resample, remainder: true)
+            .map{ it[0..1] + [it[2] ?: []] }
+
         IMAGE_RESAMPLE ( ch_resampling )
         ch_versions = ch_versions.mix(IMAGE_RESAMPLE.out.versions.first())
 
         // ** Brain extraction ** //
-        ch_bet = IMAGE_RESAMPLE.out.image.join(ch_template).join(ch_probability_map)
+        ch_bet = IMAGE_RESAMPLE.out.image
+            .join(ch_template)
+            .join(ch_probability_map)
+
         BETCROP_ANTSBET ( ch_bet )
         ch_versions = ch_versions.mix(BETCROP_ANTSBET.out.versions.first())
 
@@ -46,7 +58,9 @@ workflow PREPROC_T1 {
         ch_versions = ch_versions.mix(BETCROP_CROPVOLUME_T1.out.versions.first())
 
         // ** crop mask ** //
-        ch_crop_mask = BETCROP_ANTSBET.out.mask.join(BETCROP_CROPVOLUME_T1.out.bounding_box)
+        ch_crop_mask = BETCROP_ANTSBET.out.mask
+            .join(BETCROP_CROPVOLUME_T1.out.bounding_box)
+
         BETCROP_CROPVOLUME_MASK ( ch_crop_mask )
         ch_versions = ch_versions.mix(BETCROP_CROPVOLUME_MASK.out.versions.first())
 
