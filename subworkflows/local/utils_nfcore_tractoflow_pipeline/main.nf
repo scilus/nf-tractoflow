@@ -82,7 +82,7 @@ workflow PIPELINE_INITIALISATION {
     // Create channel from input file provided through params.input
     //
     ch_input_sheets = Channel
-        .fromSamplesheet("input", "assets/schema_input.json")
+        .fromSamplesheet("input")
         .map{ validateInputSamplesheet(it) }
         .branch {
             bids: it.size() == 4
@@ -131,7 +131,7 @@ workflow PIPELINE_INITIALISATION {
                 }
             }
 
-            return [sid,
+            return [[id: sid],
                 file(item.dwi), file(item.bval), file(item.bvec), file(item.topup),
                 file(item.rev_dwi), file(item.rev_bval), file(item.rev_bvec), file(item.rev_topup),
                 file(item.t1), file(item.wmparc), file(item.aparc_aseg)]
@@ -192,15 +192,48 @@ workflow PIPELINE_COMPLETION {
 // Validate channels from input samplesheet
 //
 def validateInputSamplesheet(input) {
-    def (metas, fastqs) = input[1..2]
+    def meta = input[0]
+    def (dwi, bval, bvec, sbref, rev_dwi, rev_bval, rev_bvec, rev_sbref, t1, wmparc, aparc_aseg) = input[1..-1]
 
-    // Check that multiple runs of the same sample are of the same datatype i.e. single-end / paired-end
-    def endedness_ok = metas.collect{ it.single_end }.unique().size == 1
-    if (!endedness_ok) {
-        error("Please check input samplesheet -> Multiple runs of a sample must be of the same datatype i.e. single-end or paired-end: ${metas[0].id}")
+    (dwi, sbref, rev_dwi, rev_sbref, t1, wmparc, aparc_aseg) = [
+        dwi, sbref, rev_dwi, rev_sbref,
+        t1, wmparc, aparc_aseg
+    ].collect{
+        if ( it ) {
+            def f = file(it)
+            def ext = f.getExtension() ?: "nii.gz"
+            def name = "${f.getParent()}/${f.getSimpleName()}.$ext"
+            f.copyTo(name)
+            return name
+        }
+        return it
     }
 
-    return [ metas[0], fastqs ]
+    (bval, rev_bval) = [bval, rev_bval].collect{
+        if ( it ) {
+            def f = file(it)
+            def name = "${f.getParent()}/${f.getSimpleName()}.bval"
+            f.copyTo(name)
+            return name
+        }
+        return it
+    }
+
+    (bvec, rev_bvec) = [bvec, rev_bvec].collect{
+        if ( it ) {
+            def f = file(it)
+            def name = "${f.getParent()}/${f.getSimpleName()}.bvec"
+            f.copyTo(name)
+            return name
+        }
+        return it
+    }
+
+    return [ meta,
+        dwi, bval, bvec, sbref,
+        rev_dwi, rev_bval, rev_bvec, rev_sbref,
+        t1, wmparc, aparc_aseg
+    ]
 }
 
 //

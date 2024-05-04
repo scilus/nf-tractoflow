@@ -44,28 +44,33 @@ workflow TRACTOFLOW {
 
     ch_versions = Channel.empty()
     ch_multiqc_files = Channel.empty()
-    ch_topup_config = null
+    ch_topup_config = Channel.empty()
     ch_bet_template = Channel.empty()
 
-    ch_samplesheet.view()
-
     /* Load topup config if provided */
-    if ( params.topup_config ) ch_topup_config = Channel.fromPath(params.topup_config, checkIfExists: true)
+    if ( params.dwi_susceptibility_filter_config_file ) {
+        if ( file(params.dwi_susceptibility_filter_config_file).exists()) {
+            ch_topup_config = Channel.fromPath(params.topup_config, checkIfExists: true)
+        }
+        else {
+            ch_topup_config = Channel.from( params.dwi_susceptibility_filter_config_file )
+        }
+    }
 
     /* Load bet template */
-    ch_bet_template = Channel.fromPath(params.t1_bet_template, checkIfExists: true)
-    ch_bet_probability = Channel.fromPath(params.t1_bet_probability, checkIfExists: true)
+    ch_bet_template = Channel.fromPath(params.t1_bet_template_t1, checkIfExists: true)
+    ch_bet_probability = Channel.fromPath(params.t1_bet_template_probability_map, checkIfExists: true)
 
     /* Unpack inputs */
     ch_inputs = ch_samplesheet
-        .multiMap{ id, dwi, bval, bvec, sbref, rev_dwi, rev_bval, rev_bvec, rev_sbref, t1, wmparc, aparc_aseg ->
-            dwi: [[id: id], dwi, bval, bvec]
-            sbref: [[id: id], sbref]
-            rev_dwi: [[id: id], rev_dwi, rev_bval, rev_bvec]
-            rev_sbref: [[id: id], rev_sbref]
-            t1: [[id: id], t1]
-            wmparc: [[id: id], wmparc]
-            aparc_aseg: [[id: id], aparc_aseg]
+        .multiMap{ meta, dwi, bval, bvec, sbref, rev_dwi, rev_bval, rev_bvec, rev_sbref, t1, wmparc, aparc_aseg ->
+            dwi: [meta, dwi, bval, bvec]
+            sbref: [meta, sbref]
+            rev_dwi: [meta, rev_dwi, rev_bval, rev_bvec]
+            rev_sbref: [meta, rev_sbref]
+            t1: [meta, t1]
+            wmparc: [meta, wmparc]
+            aparc_aseg: [meta, aparc_aseg]
         }
 
     /* PREPROCESSING */
@@ -82,10 +87,11 @@ workflow TRACTOFLOW {
     //
     // SUBWORKFLOW: Run PREPROC_T1
     //
+    ch_t1_meta = ch_inputs.t1.map{ it[1] }
     PREPROC_T1(
         ch_inputs.t1,
-        ch_bet_template,
-        ch_bet_probability,
+        ch_t1_meta.combine(ch_bet_template),
+        ch_t1_meta.combine(ch_bet_probability),
         [], [], []
     )
 
@@ -115,18 +121,18 @@ workflow TRACTOFLOW {
     // MODULE: Run REGISTRATION_ANTSAPPLYTRANSFORMS (TRANSFORM_WMPARC)
     //
     TRANSFORM_WMPARC(
-        ch_inputs.wmparc,
-        PREPROC_DWI.out.b0,
-        T1_REGISTRATION.out.transfo_image
+        ch_inputs.wmparc
+            .join(PREPROC_DWI.out.b0)
+            .join(T1_REGISTRATION.out.transfo_image)
     )
 
     //
     // MODULE: Run REGISTRATION_ANTSAPPLYTRANSFORMS (TRANSFORM_APARC_ASEG)
     //
     TRANSFORM_APARC_ASEG(
-        ch_inputs.aparc_aseg,
-        PREPROC_DWI.out.b0,
-        T1_REGISTRATION.out.transfo_image
+        ch_inputs.aparc_aseg
+            .join(PREPROC_DWI.out.b0)
+            .join(T1_REGISTRATION.out.transfo_image)
     )
 
     //
@@ -134,8 +140,8 @@ workflow TRACTOFLOW {
     //
     ANATOMICAL_SEGMENTATION(
         T1_REGISTRATION.out.image_warped,
-        TRANSFORM_WMPARC.out.warped
-            .join(TRANSFORM_APARC_ASEG.out.warped)
+        TRANSFORM_WMPARC.out.warpedimage
+            .join(TRANSFORM_APARC_ASEG.out.warpedimage)
     )
 
     /* RECONSTRUCTION */
@@ -162,7 +168,7 @@ workflow TRACTOFLOW {
 
     /* Run fiber response aeraging over subjects */
     ch_fiber_response = RECONST_FRF.out.frf
-    if ( params.average_fiber_response ) {
+    if ( params.dwi_fodf_fit_use_average_frf ) {
         RECONST_MEANFRF( RECONST_FRF.out.frf.map{ it[1] }.flatten() )
         ch_fiber_response = RECONST_FRF.out.map{ it[0] }
             .combine( RECONST_MEANFRF.out.meanfrf )
@@ -176,7 +182,7 @@ workflow TRACTOFLOW {
         .join(PREPROC_DWI.out.bvec)
         .join(PREPROC_DWI.out.b0_mask)
         .join(RECONST_DTIMETRICS.out.fa)
-        .join(RECONST_DTIMETRICS.ou.md)
+        .join(RECONST_DTIMETRICS.out.md)
         .join(ch_fiber_response)
     RECONST_FODF( ch_reconst_fodf )
 
