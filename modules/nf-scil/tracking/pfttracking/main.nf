@@ -57,17 +57,17 @@ process TRACKING_PFTTRACKING {
 
     if [ "${pft_seeding_mask}" == "wm" ]; then
         scil_image_math.py convert $wm ${prefix}__mask_wm.nii.gz \
-            --data_type uint8
+            --data_type uint8 -f
         scil_image_math.py union ${prefix}__mask_wm.nii.gz \
             ${prefix}__interface.nii.gz ${prefix}__pft_seeding_mask.nii.gz\
-            --data_type uint8
+            --data_type uint8 -f
 
     elif [ "${pft_seeding_mask}" == "interface" ]; then
         cp ${prefix}__interface.nii.gz ${prefix}__pft_seeding_mask.nii.gz
 
     elif [ "${pft_seeding_mask}" == "fa" ]; then
         mrcalc $fa $pft_fa_threshold -ge ${prefix}__pft_seeding_mask.nii.gz\
-            -datatype uint8
+            -datatype uint8 -force
     fi
 
     scil_compute_pft.py $fodf ${prefix}__pft_seeding_mask.nii.gz \

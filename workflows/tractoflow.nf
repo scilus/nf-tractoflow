@@ -124,8 +124,10 @@ workflow TRACTOFLOW {
     //
     TRANSFORM_WMPARC(
         ch_inputs.wmparc
+            .filter{ it[1] }
             .join(PREPROC_DWI.out.b0)
             .join(T1_REGISTRATION.out.transfo_image)
+            .map{ it[0..2] + [it[3..-1]] }
     )
 
     //
@@ -133,8 +135,10 @@ workflow TRACTOFLOW {
     //
     TRANSFORM_APARC_ASEG(
         ch_inputs.aparc_aseg
+            .filter{ it[1] }
             .join(PREPROC_DWI.out.b0)
             .join(T1_REGISTRATION.out.transfo_image)
+            .map{ it[0..2] + [it[3..-1]] }
     )
 
     //
