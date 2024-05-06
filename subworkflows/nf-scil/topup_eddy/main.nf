@@ -9,59 +9,56 @@ workflow TOPUP_EDDY {
     // ** In both cases, it will perform EDDY and also extract a b0 from the corrected DWI image. ** //
 
     take:
-        ch_dwi // channel: [ val(meta), [ dwi, bval, bvec ]
-        ch_b0 // channel: [ val(meta), b0 ]
-        ch_rev_dwi // channel: [ val(meta), [ rev_dwi, rev_bval, rev_bvec ]
-        ch_rev_b0 // channel: [ val(meta), rev_b0 ]
+        ch_dwi          // channel: [ val(meta), [ dwi, bval, bvec ]
+        ch_b0           // channel: [ val(meta), b0 ]
+        ch_rev_dwi      // channel: [ val(meta), [ rev_dwi, rev_bval, rev_bvec ]
+        ch_rev_b0       // channel: [ val(meta), rev_b0 ]
         ch_config_topup // channel
 
     main:
         ch_versions = Channel.empty()
 
         // ** Create channel for TOPUP ** //
-        if ( ch_rev_dwi )
-        {
-            ch_image =    ch_dwi.join(ch_b0)
-                                .join(ch_rev_dwi)
-            ch_eddy_input =   ch_dwi.combine(ch_rev_dwi, by: 0)
-        }
-        else {
-            ch_image =    ch_dwi.join(ch_b0)
-                                .map{ it + [[], [], []] }
-            ch_eddy_input =   ch_dwi.map{ it + [[], [], []] }
-        }
-        if ( ch_rev_b0 )
-        {
-            ch_image =    ch_image.join(ch_rev_b0)
-        }
-        else {
-            ch_image =    ch_image.map{ it + [[]] }
-        }
+        ch_topup = ch_dwi
+            .join(ch_b0, remainder: true)
+            .map{ it[0..3] + [it[4] ?: []] }
 
-        if ( ch_rev_dwi || ch_rev_b0 )
-        {
-            // ** RUN TOPUP ** //
-            PREPROC_TOPUP ( ch_image, ch_config_topup )
-            ch_versions = ch_versions.mix(PREPROC_TOPUP.out.versions.first())
+        ch_topup_reverse = ch_rev_dwi
+            .join(ch_rev_b0, remainder: true)
+            .filter{ it ? it[1] : false }
+            .map{ it[0..3] + [it[4] ?: []] }
 
-            // ** Create channel for EDDY ** //
-            ch_eddy_input =    ch_eddy_input.combine(PREPROC_TOPUP.out.topup_corrected_b0s, by: 0)
-                                            .combine(PREPROC_TOPUP.out.topup_fieldcoef, by: 0)
-                                            .combine(PREPROC_TOPUP.out.topup_movpart, by: 0)
-        }
-        else
-        {
-            // ** RUN EDDY ** //
-            ch_eddy_input =    ch_dwi.map{ it + [[], [], [], [], [], []] }
-        }
+        ch_topup = ch_topup
+            .join(ch_topup_reverse, remainder: true)
+            .branch{
+                with_topup: it[5] || it[8]
+            }
+
+        // ** RUN TOPUP ** //
+        PREPROC_TOPUP ( ch_topup.with_topup, ch_config_topup )
+        ch_versions = ch_versions.mix(PREPROC_TOPUP.out.versions.first())
+
+        // ** Create channel for EDDY ** //
+        ch_eddy_input = ch_dwi
+            .join(ch_rev_dwi, remainder: true)
+            .map{ it[0..3] + [it[4] ? it[4..-1] : [], [], []] }
+            .join(PREPROC_TOPUP.out.topup_corrected_b0s, remainder: true)
+            .map{ it[0..6] + [it[7] ?: []] }
+            .join(PREPROC_TOPUP.out.topup_fieldcoef, remainder: true)
+            .map{ it[0..7] + [it[8] ?: []] }
+            .join(PREPROC_TOPUP.out.topup_movpart, remainder: true)
+            .map{ it[0..8] + [it[9] ?: []] }
 
         PREPROC_EDDY ( ch_eddy_input )
-        ch_dwi_extract_b0 =   PREPROC_EDDY.out.dwi_corrected.combine(PREPROC_EDDY.out.bval_corrected, by: 0)
-                                                            .combine(PREPROC_EDDY.out.bvec_corrected, by: 0)
-        UTILS_EXTRACTB0 { ch_dwi_extract_b0 }
-
-        ch_versions = ch_versions.mix(UTILS_EXTRACTB0.out.versions.first())
         ch_versions = ch_versions.mix(PREPROC_EDDY.out.versions.first())
+
+        ch_dwi_extract_b0 = PREPROC_EDDY.out.dwi_corrected
+            .join(PREPROC_EDDY.out.bval_corrected)
+            .join(PREPROC_EDDY.out.bvec_corrected)
+
+        UTILS_EXTRACTB0 { ch_dwi_extract_b0 }
+        ch_versions = ch_versions.mix(UTILS_EXTRACTB0.out.versions.first())
+
 
     emit:
         dwi      = PREPROC_EDDY.out.dwi_corrected       // channel: [ val(meta), [ dwi_corrected ] ]
