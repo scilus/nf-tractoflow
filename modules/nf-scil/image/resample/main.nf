@@ -1,6 +1,7 @@
 process IMAGE_RESAMPLE {
     tag "$meta.id"
     label 'process_single'
+    label 'process_high_memory'
 
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://scil.usherbrooke.ca/containers/scilus_1.6.0.sif':

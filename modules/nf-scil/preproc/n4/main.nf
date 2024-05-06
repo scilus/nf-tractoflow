@@ -1,6 +1,7 @@
 process PREPROC_N4 {
     tag "$meta.id"
     label 'process_medium'
+    label "process_high_memory"
 
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://scil.usherbrooke.ca/containers/scilus_1.6.0.sif':
