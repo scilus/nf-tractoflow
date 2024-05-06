@@ -22,6 +22,7 @@ include { imNotification            } from '../../nf-core/utils_nfcore_pipeline'
 include { UTILS_NFCORE_PIPELINE     } from '../../nf-core/utils_nfcore_pipeline'
 include { workflowCitation          } from '../../nf-core/utils_nfcore_pipeline'
 
+include { IO_SAFECASTINPUTS         } from '../../../modules/local/io/safecastinputs/main'
 include { IO_READBIDS               } from '../../../modules/nf-scil/io/readbids/main'
 
 /*
@@ -140,8 +141,10 @@ workflow PIPELINE_INITIALISATION {
 
     ch_samplesheet = ch_samplesheet.mix(ch_input_sheets.raw)
 
+    IO_SAFECASTINPUTS( ch_samplesheet )
+
     emit:
-    samplesheet = ch_samplesheet
+    samplesheet = IO_SAFECASTINPUTS.out.safe_inputs
     versions    = ch_versions
 }
 
@@ -192,48 +195,7 @@ workflow PIPELINE_COMPLETION {
 // Validate channels from input samplesheet
 //
 def validateInputSamplesheet(input) {
-    def meta = input[0]
-    def (dwi, bval, bvec, sbref, rev_dwi, rev_bval, rev_bvec, rev_sbref, t1, wmparc, aparc_aseg) = input[1..-1]
-
-    (dwi, sbref, rev_dwi, rev_sbref, t1, wmparc, aparc_aseg) = [
-        dwi, sbref, rev_dwi, rev_sbref,
-        t1, wmparc, aparc_aseg
-    ].collect{
-        if ( it ) {
-            def f = file(it)
-            def ext = f.getExtension() ?: "nii.gz"
-            def name = "${f.getParent()}/${f.getSimpleName()}.$ext"
-            f.copyTo(name)
-            return name
-        }
-        return it
-    }
-
-    (bval, rev_bval) = [bval, rev_bval].collect{
-        if ( it ) {
-            def f = file(it)
-            def name = "${f.getParent()}/${f.getSimpleName()}.bval"
-            f.copyTo(name)
-            return name
-        }
-        return it
-    }
-
-    (bvec, rev_bvec) = [bvec, rev_bvec].collect{
-        if ( it ) {
-            def f = file(it)
-            def name = "${f.getParent()}/${f.getSimpleName()}.bvec"
-            f.copyTo(name)
-            return name
-        }
-        return it
-    }
-
-    return [ meta,
-        dwi, bval, bvec, sbref,
-        rev_dwi, rev_bval, rev_bvec, rev_sbref,
-        t1, wmparc, aparc_aseg
-    ]
+    return input
 }
 
 //

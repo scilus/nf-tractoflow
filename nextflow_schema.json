@@ -158,6 +158,18 @@
                     "minimum": -1,
                     "maximum": 1
                 },
+                "dwi_bias_correction_bspline_knots_per_voxel": {
+                    "type": "number",
+                    "default": 0.25,
+                    "description": "Number of B-Spline knots per voxel for bias correction.",
+                    "minimum": 0
+                },
+                "dwi_bias_correction_shrink_factor": {
+                    "type": "integer",
+                    "default": 4,
+                    "description": "Shrink factor for bias correction.",
+                    "minimum": 1
+                },
                 "dwi_intensities_normalize_fa_mask_threshold": {
                     "type": "number",
                     "default": 0.4,

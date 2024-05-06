@@ -87,12 +87,14 @@ workflow TRACTOFLOW {
     //
     // SUBWORKFLOW: Run PREPROC_T1
     //
-    ch_t1_meta = ch_inputs.t1.map{ it[1] }
+    ch_t1_meta = ch_inputs.t1.map{ it[0] }
     PREPROC_T1(
         ch_inputs.t1,
         ch_t1_meta.combine(ch_bet_template),
         ch_t1_meta.combine(ch_bet_probability),
-        [], [], []
+        Channel.empty(),
+        Channel.empty(),
+        Channel.empty()
     )
 
     //
