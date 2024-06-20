@@ -50,24 +50,22 @@ process TRACKING_LOCALTRACKING {
 
     if [ "${local_tracking_mask}" == "wm" ]; then
         scil_image_math.py convert $wm ${prefix}__local_tracking_mask.nii.gz \
-            --data_type uint8
-
+            --data_type uint8 -f
     elif [ "${local_tracking_mask}" == "fa" ]; then
         scil_image_math.py lower_threshold $fa \
             $local_fa_tracking_mask_threshold \
             ${prefix}__local_tracking_mask.nii.gz \
-            --data_type uint8
+            --data_type uint8 -f
     fi
 
     if [ "${local_seeding_mask}" == "wm" ]; then
         scil_image_math.py convert $wm ${prefix}__local_seeding_mask.nii.gz \
-            --data_type uint8
-
+            --data_type uint8 -f
     elif [ "${local_seeding_mask}" == "fa" ]; then
         scil_image_math.py lower_threshold $fa \
             $local_fa_seeding_mask_threshold \
             ${prefix}__local_seeding_mask.nii.gz \
-            --data_type uint8
+            --data_type uint8 -f
     fi
 
     scil_compute_local_tracking.py $fodf ${prefix}__local_seeding_mask.nii.gz ${prefix}__local_tracking_mask.nii.gz tmp.trk $enable_gpu\
