@@ -13,7 +13,6 @@ include { paramsSummaryMap          } from 'plugin/nf-schema'
 include { samplesheetToList         } from 'plugin/nf-schema'
 include { completionEmail           } from '../../nf-core/utils_nfcore_pipeline'
 include { completionSummary         } from '../../nf-core/utils_nfcore_pipeline'
-include { imNotification            } from '../../nf-core/utils_nfcore_pipeline'
 include { UTILS_NFCORE_PIPELINE     } from '../../nf-core/utils_nfcore_pipeline'
 include { UTILS_NEXTFLOW_PIPELINE   } from '../../nf-core/utils_nextflow_pipeline'
 
@@ -85,10 +84,10 @@ workflow PIPELINE_INITIALISATION {
     /// Unpack BIDS into subjects
     ///
     ch_samplesheet = IO_READBIDS.out.bids.map{
-        jsonSlurper = new JsonSlurper()
-        data = jsonSlurper.parseText(it.getText())
-        for (item in data){
-            sid = "sub-" + item.subject
+        def jsonSlurper = new groovy.json.JsonSlurper()
+        def data = jsonSlurper.parseText(it.getText())
+        data.each{ item ->
+            def sid = "sub-" + item.subject
 
             if (item.session)
             {
@@ -100,8 +99,7 @@ workflow PIPELINE_INITIALISATION {
                 sid += "_run-" + item.run
             }
 
-            for (key in item.keySet())
-            {
+            item.keySet().each{ key ->
                 if(item[key] == 'todo')
                 {
                     error "Error ~ Please look at your tractoflow_bids_struct.json " +
@@ -150,7 +148,6 @@ workflow PIPELINE_COMPLETION {
     plaintext_email // boolean: Send plain-text email instead of HTML
     outdir          //    path: Path to output directory where results will be published
     monochrome_logs // boolean: Disable ANSI colour codes in log output
-    hook_url        //  string: hook URL for notifications
     multiqc_report  //  string: Path to MultiQC report
 
     main:
@@ -174,9 +171,6 @@ workflow PIPELINE_COMPLETION {
         }
 
         completionSummary(monochrome_logs)
-        if (hook_url) {
-            imNotification(summary_params, hook_url)
-        }
     }
 
     workflow.onError {
