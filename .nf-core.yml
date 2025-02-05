@@ -24,3 +24,7 @@ template:
   prefix: nf
   skip:
     - igenomes
+    - fastqc
+    - seqera_platform
+    - adaptivecard
+    - slackreport
