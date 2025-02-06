@@ -238,13 +238,6 @@
                     "description": "Run T1 denoising.",
                     "help_text": "Run T1 denoising."
                 },
-                "number_of_tissues": {
-                    "type": "integer",
-                    "default": 3,
-                    "description": "Number of tissue classes to estimate on the T1.",
-                    "help_text": "Number of tissue classes to estimate on the T1.",
-                    "minimum": 1
-                },
                 "template_t1": {
                     "type": "string",
                     "default": "/human-data/mni_152_sym_09c/t1",
@@ -453,7 +446,7 @@
                 "sh_fitting_shells": {
                     "type": "string",
                     "description": "Shells selected to compute the SH fitting. Please write them between quotes e.g. (--sh_fitting_shells \"0 1000\"). NOTE: SH fitting works only on single shell. You must include the b0 shell as well.",
-                    "help_text":  "Shells selected to compute the SH fitting. Please write them between quotes e.g. (--sh_fitting_shells \"0 1000\"). NOTE: SH fitting works only on single shell. You must include the b0 shell as well."
+                    "help_text": "Shells selected to compute the SH fitting. Please write them between quotes e.g. (--sh_fitting_shells \"0 1000\"). NOTE: SH fitting works only on single shell. You must include the b0 shell as well."
                 }
             }
         },
@@ -556,12 +549,6 @@
                     "description": "[PFT] Maximum length .",
                     "help_text": "[PFT] Maximum length .",
                     "minimum": 0
-                },
-                "pft_compress_streamlines": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "[PFT] Compress streamlines.",
-                    "help_text": "[PFT] Compress streamlines."
                 },
                 "pft_particles": {
                     "type": "integer",
@@ -718,12 +705,6 @@
                     "help_text": "[LOCAL] Maximum length.",
                     "minimum": 0
                 },
-                "local_compress_streamlines": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "[LOCAL] Compress streamlines.",
-                    "help_text": "[LOCAL] Compress streamlines."
-                },
                 "local_compress_value": {
                     "type": "number",
                     "default": 0.2,
@@ -851,7 +832,14 @@
                     "description": "Method used to save pipeline results to output directory.",
                     "help_text": "The Nextflow `publishDir` option specifies which intermediate files should be saved to the output directory. This option tells the pipeline what method should be used to move these files. See [Nextflow docs](https://www.nextflow.io/docs/latest/process.html#publishdir) for details.",
                     "fa_icon": "fas fa-copy",
-                    "enum": ["symlink", "rellink", "link", "copy", "copyNoFollow", "move"],
+                    "enum": [
+                        "symlink",
+                        "rellink",
+                        "link",
+                        "copy",
+                        "copyNoFollow",
+                        "move"
+                    ],
                     "hidden": true
                 },
                 "email_on_fail": {
@@ -972,23 +960,11 @@
         }
     ],
     "properties": {
-        "processes_brain_extraction_t1": {
-            "type": "integer",
-            "default": 4,
-            "description": "Number of processes for T1 brain extraction.",
-            "help_text": "Number of processes for T1 brain extraction."
-        },
         "processes_denoise_dwi": {
             "type": "integer",
             "default": 4,
             "description": "Number of processes for DWI denoising.",
             "help_text": "Number of processes for DWI denoising."
-        },
-        "processes_denoise_t1": {
-            "type": "integer",
-            "default": 4,
-            "description": "Number of processes for T1 denoising",
-            "help_text": "Number of processes for T1 denoising"
         },
         "processes_eddy": {
             "type": "integer",
@@ -1002,17 +978,29 @@
             "description": "Number of processes for fODF fitting.",
             "help_text": "Number of processes for fODF fitting."
         },
-        "processes_registration": {
-            "type": "integer",
-            "default": 4,
-            "description": "Number of processes for registration task",
-            "help_text": "Number of processes for registration task"
-        },
         "processes_local_tracking": {
             "type": "integer",
             "default": 4,
             "description": "Number of processes for local tractography.",
             "help_text": "Number of processes for local tractography."
+        },
+        "processes_denoise_t1": {
+            "type": "integer",
+            "default": 4,
+            "description": "Number of processes for T1 denoising",
+            "help_text": "Number of processes for T1 denoising"
+        },
+        "processes_brain_extraction_t1": {
+            "type": "integer",
+            "default": 4,
+            "description": "Number of processes for T1 brain extraction.",
+            "help_text": "Number of processes for T1 brain extraction."
+        },
+        "processes_registration": {
+            "type": "integer",
+            "default": 4,
+            "description": "Number of processes for registration task",
+            "help_text": "Number of processes for registration task"
         }
     }
 }

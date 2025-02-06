@@ -1,0 +1,58 @@
+---
+name: "registration_antsapplytransforms"
+description: register image from transform
+keywords:
+  - MRI
+  - registration
+  - medical imaging
+tools:
+  - "ANTs":
+      description: "perform registration using transform as input"
+      homepage: "https://antsx.github.io/ANTsRCore/reference/antsApplyTransforms.html"
+
+input:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. `[ id:'test', single_end:false ]`
+
+  - image:
+      type: file
+      description: Input image to register
+      pattern: "*.{nii.nii.gz}"
+
+  - reference:
+      type: file
+      description: Reference image for registration
+      pattern: "*.{nii.nii.gz}"
+
+  - warp:
+      type: file
+      description: Warp transformation file to warp image or trk.
+      pattern: "*.{nii,nii.gz}"
+
+  - affine:
+      type: file
+      description: Affine or rigig transformation file to warp image or trk (*mat). If a rigid or affine transformation needs to be inverted before being applied, use antsApplyTransforms with the  -o Linear[inversedTransform,1], as this module does not handles it.
+      pattern: "*.mat"
+
+output:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. `[ id:'test', single_end:false ]`
+
+  - warped_image:
+      type: file
+      description: Warped image
+      pattern: "*.{nii.nii.gz}"
+
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+
+authors:
+  - "@scilus"
