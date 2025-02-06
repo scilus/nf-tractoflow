@@ -70,14 +70,6 @@
                     "fa_icon": "fas fa-wrench",
                     "help_text": "If set, it will remove all the participants that are missing any information."
                 },
-                "dwi_shell_tolerance": {
-                    "type": "integer",
-                    "default": 20,
-                    "description": "Consider all b-values up to +-tolerance as belonging to the same shell.",
-                    "minimum": 0,
-                    "fa_icon": "fas fa-wrench",
-                    "help_text": "Consider all b-values up to +-tolerance as belonging to the same shell."
-                },
                 "b0_thr_extract_b0": {
                     "type": "integer",
                     "default": 10,
@@ -86,6 +78,14 @@
                     "maximum": 100,
                     "fa_icon": "fas fa-wrench",
                     "help_text": "Consider all b-values below threshold as b=0 images."
+                },
+                "dwi_shell_tolerance": {
+                    "type": "integer",
+                    "default": 20,
+                    "description": "Consider all b-values up to +-tolerance as belonging to the same shell.",
+                    "minimum": 0,
+                    "fa_icon": "fas fa-wrench",
+                    "help_text": "Consider all b-values up to +-tolerance as belonging to the same shell."
                 },
                 "output_dir": {
                     "type": "string",

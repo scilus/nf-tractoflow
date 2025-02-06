@@ -70,62 +70,46 @@ workflow PIPELINE_INITIALISATION {
     // Create channel from input file provided through params.input
     //
     ch_input_sheets = Channel
-        .fromSamplesheet("input")
-        .map{ validateInputSamplesheet(it) }
-        .branch {
-            bids: it.size() == 4
-            raw: true
+        .fromList(samplesheetToList(params.input, "${projectDir}/assets/schema_raw_input.json"))
+        .map{
+            meta, dwi, bval, bvec, sbref, rev_dwi, rev_bval, rev_bvec, rev_sbref, t1, wmparc, aparc_aseg ->
+                return [
+                    [id: meta],
+                    dwi,
+                    bval,
+                    bvec,
+                    sbref ?: null,
+                    rev_dwi ?: null,
+                    rev_bval ?: null,
+                    rev_bvec ?: null,
+                    rev_sbref ?: null,
+                    t1,
+                    wmparc ?: null,
+                    aparc_aseg ?: null
+                ]
+        }
+        .groupTuple()
+        .map{ samplesheet ->
+            validateInputSamplesheet(samplesheet)
         }
 
-    IO_READBIDS ( ch_input_sheets.bids.map{ it[1..-1] } )
+    ch_bids_sheets = Channel
+        .fromList(samplesheetToList(params.bids, "${projectDir}/asset/schema_bids_input.json"))
+        .map{
+            dbname, bidsfolder, fsfolder, bidsignore ->
+                return [[name: dbname], bidsfolder, fsfolder ?: [], bidsignore ?: []]
+        }
+
+    IO_READBIDS ( ch_bids_sheets.map{ it[1..-1] } )
     ch_versions = ch_versions.mix(IO_READBIDS.out.versions)
 
-    ///
-    /// Unpack BIDS into subjects
-    ///
-    ch_samplesheet = IO_READBIDS.out.bids.map{
-        def jsonSlurper = new groovy.json.JsonSlurper()
-        def data = jsonSlurper.parseText(it.getText())
-        data.each{ item ->
-            def sid = "sub-" + item.subject
-
-            if (item.session)
-            {
-                sid += "_ses-" + item.session
-            }
-
-            if (item.run)
-            {
-                sid += "_run-" + item.run
-            }
-
-            item.keySet().each{ key ->
-                if(item[key] == 'todo')
-                {
-                    error "Error ~ Please look at your tractoflow_bids_struct.json " +
-                    "in Read_BIDS folder.\nPlease fix todo fields and give " +
-                    "this file in input using --bids_config option instead of " +
-                    "using --bids."
-                }
-                else if (item[key] == 'error_readout')
-                {
-                    error "Error ~ Please look at your tractoflow_bids_struct.json " +
-                    "in Read_BIDS folder.\nPlease fix error_readout fields. "+
-                    "This error indicate that readout time looks wrong.\n"+
-                    "Please correct the value or remove the subject in the json and " +
-                    "give the updated file in input using --bids_config option instead of " +
-                    "using --bids."
-                }
-            }
-
-            return [[id: sid],
-                file(item.dwi), file(item.bval), file(item.bvec), file(item.topup),
-                file(item.rev_dwi), file(item.rev_bval), file(item.rev_bvec), file(item.rev_topup),
-                file(item.t1), file(item.wmparc), file(item.aparc_aseg)]
+    ch_bids_sheets = IO_READBIDS.out.bidsstructure
+        .map{ samplesheet -> 
+            validateBidsSamplesheet(samplesheet)
         }
-    }
+        .reduce{ a, b -> a + b }
 
-    ch_samplesheet = ch_samplesheet.mix(ch_input_sheets.raw)
+    ch_samplesheet = ch_bids_sheets.mix(ch_input_sheets.raw)
 
     IO_SAFECASTINPUTS( ch_samplesheet )
 
@@ -189,6 +173,60 @@ workflow PIPELINE_COMPLETION {
 //
 def validateInputSamplesheet(input) {
     return input
+}
+
+def validateBidsSamplesheet(bids) {
+    ///
+    /// Unpack BIDS into subjects
+    ///
+    def jsonSlurper = new groovy.json.JsonSlurper()
+    return jsonSlurper.parseText(bids.getText()).each{ item ->
+        def sid = "sub-" + item.subject
+
+        if (item.session)
+        {
+            sid += "_ses-" + item.session
+        }
+
+        if (item.run)
+        {
+            sid += "_run-" + item.run
+        }
+
+        item.keySet().each{ key->
+            if(item[key] == 'todo')
+            {
+                error "Error ~ Please look at your tractoflow_bids_struct.json " +
+                "in Read_BIDS folder.\nPlease fix todo fields and give " +
+                "this file in input using --bids_config option instead of " +
+                "using --bids."
+            }
+            else if (item[key] == 'error_readout')
+            {
+                error "Error ~ Please look at your tractoflow_bids_struct.json " +
+                "in Read_BIDS folder.\nPlease fix error_readout fields. "+
+                "This error indicate that readout time looks wrong.\n"+
+                "Please correct the value or remove the subject in the json and " +
+                "give the updated file in input using --bids_config option instead of " +
+                "using --bids."
+            }
+        }
+
+        return [
+            [id: sid],
+            file(item.dwi),
+            file(item.bval),
+            file(item.bvec),
+            file(item.topup),
+            file(item.rev_dwi),
+            file(item.rev_bval),
+            file(item.rev_bvec),
+            file(item.rev_topup),
+            file(item.t1),
+            file(item.wmparc),
+            file(item.aparc_aseg)
+        ]
+    }
 }
 //
 // Generate methods description for MultiQC
