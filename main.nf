@@ -57,7 +57,7 @@ workflow {
         params.validate_params,
         params.monochrome_logs,
         args,
-        params.output_dir,
+        params.outdir,
         params.input
     )
 
@@ -74,7 +74,7 @@ workflow {
         params.email,
         params.email_on_fail,
         params.plaintext_email,
-        params.output_dir,
+        params.outdir,
         params.monochrome_logs,
         SCILUS_NF_TRACTOFLOW.out.multiqc_report
     )
