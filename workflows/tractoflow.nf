@@ -3,15 +3,12 @@
     IMPORT MODULES / SUBWORKFLOWS / FUNCTIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
+
 include { MULTIQC                } from '../modules/nf-core/multiqc/main'
 include { paramsSummaryMap       } from 'plugin/nf-schema'
 include { paramsSummaryMultiqc   } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_tractoflow_pipeline'
-include { TRACTOFLOW as RUN } from '../subworkflows/nf-neuro/tractoflow'
-include { RECONST_SHSIGNAL } from '../modules/local/reconst/shsignal'
-
-
 include { TRACTOFLOW as RUN } from '../subworkflows/nf-neuro/tractoflow'
 include { RECONST_SHSIGNAL } from '../modules/local/reconst/shsignal'
 
@@ -21,7 +18,7 @@ include { RECONST_SHSIGNAL } from '../modules/local/reconst/shsignal'
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-workflow NF_TRACTOFLOW {
+workflow TRACTOFLOW {
 
     take:
     ch_samplesheet // channel: samplesheet read in from --input
@@ -92,7 +89,7 @@ workflow NF_TRACTOFLOW {
     softwareVersionsToYAML(ch_versions)
         .collectFile(
             storeDir: "${params.output_dir}/pipeline_info",
-            name:  'nf-tractoflow_software_'  + 'mqc_'  + 'versions.yml',
+            name:  'tractoflow_software_'  + 'mqc_'  + 'versions.yml',
             sort: true,
             newLine: true
         ).set { ch_collated_versions }
@@ -138,8 +135,7 @@ workflow NF_TRACTOFLOW {
         []
     )
 
-    emit:
-    multiqc_report = MULTIQC.out.report.toList() // channel: /path/to/multiqc_report.html
+    emit:multiqc_report = MULTIQC.out.report.toList() // channel: /path/to/multiqc_report.html
     versions       = ch_versions                 // channel: [ path(versions.yml) ]
 
 }

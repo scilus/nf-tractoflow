@@ -55,7 +55,7 @@ An [example samplesheet](../assets/samplesheet.csv) has been provided with the p
 The typical command for running the pipeline is as follows:
 
 ```bash
-nextflow run scilus/nf-tractoflow --input ./samplesheet.csv --outdir ./results  -profile docker
+nextflow run scilus/nf-tractoflow --input ./samplesheet.csv --output_dir ./results  -profile docker
 ```
 
 This will launch the pipeline with the `docker` configuration profile. See below for more information about profiles.
@@ -64,7 +64,7 @@ Note that the pipeline will create the following files in your working directory
 
 ```bash
 work                # Directory containing the nextflow working files
-<OUTDIR>            # Finished results in specified location (defined with --outdir)
+<OUTDIR>            # Finished results in specified location (defined with --output_dir)
 .nextflow_log       # Log file from Nextflow
 # Other nextflow hidden files, eg. history of pipeline runs and old logs.
 ```
@@ -86,7 +86,7 @@ with:
 
 ```yaml title="params.yaml"
 input: './samplesheet.csv'
-outdir: './results/'
+output_dir: './results/'
 <...>
 ```
 
