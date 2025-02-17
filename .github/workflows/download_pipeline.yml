@@ -77,7 +77,7 @@ jobs:
         run: |
           nf-core pipelines download ${{ needs.configure.outputs.REPO_LOWERCASE }} \
           --revision ${{ needs.configure.outputs.REPO_BRANCH }} \
-          --output_dir ./${{ needs.configure.outputs.REPOTITLE_LOWERCASE }} \
+          --outdir ./${{ needs.configure.outputs.REPOTITLE_LOWERCASE }} \
           --compress "none" \
           --container-system 'singularity' \
           --container-library "quay.io" -l "docker.io" -l "community.wave.seqera.io/library/" \
@@ -103,14 +103,14 @@ jobs:
         env:
           NXF_SINGULARITY_CACHEDIR: ./singularity_container_images
           NXF_SINGULARITY_HOME_MOUNT: true
-        run: nextflow run ./${{needs.configure.outputs.REPOTITLE_LOWERCASE }}/$( sed 's/\W/_/g' <<< ${{ needs.configure.outputs.REPO_BRANCH }}) -stub -profile test,singularity --output_dir ./results
+        run: nextflow run ./${{needs.configure.outputs.REPOTITLE_LOWERCASE }}/$( sed 's/\W/_/g' <<< ${{ needs.configure.outputs.REPO_BRANCH }}) -stub -profile test,singularity --outdir ./results
       - name: Run the downloaded pipeline (stub run not supported)
         id: run_pipeline
         if: ${{ steps.stub_run_pipeline.outcome == 'failure' }}
         env:
           NXF_SINGULARITY_CACHEDIR: ./singularity_container_images
           NXF_SINGULARITY_HOME_MOUNT: true
-        run: nextflow run ./${{ needs.configure.outputs.REPOTITLE_LOWERCASE }}/$( sed 's/\W/_/g' <<< ${{ needs.configure.outputs.REPO_BRANCH }}) -profile test,singularity --output_dir ./results
+        run: nextflow run ./${{ needs.configure.outputs.REPOTITLE_LOWERCASE }}/$( sed 's/\W/_/g' <<< ${{ needs.configure.outputs.REPO_BRANCH }}) -profile test,singularity --outdir ./results
 
       - name: Count the downloaded number of container images
         id: count_afterwards

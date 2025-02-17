@@ -45,8 +45,10 @@ workflow NF_TRACTOFLOW {
 
     /* Load bet template */
     if (params.template_t1) {
-        ch_bet_template = Channel.fromPath("${params.template_t1}/t1_template.nii.gz", checkIfExists: true)
-        ch_bet_probability = Channel.fromPath("${params.template_t1}/t1_brain_probability_map.nii.gz", checkIfExists: true)
+        ch_bet_template = ch_samplesheet.map{ it[0] }
+            .combine(Channel.fromPath("${params.template_t1}/t1_template.nii.gz"))
+        ch_bet_probability = ch_samplesheet.map{ it[0] }
+            .combine(Channel.fromPath("${params.template_t1}/t1_brain_probability_map.nii.gz"))
     }
 
     /* Unpack inputs */
@@ -65,15 +67,21 @@ workflow NF_TRACTOFLOW {
     RUN(
         ch_inputs.dwi,
         ch_inputs.t1,
-        ch_inputs.sbref,
-        ch_inputs.rev_dwi,
-        ch_inputs.rev_sbref,
-        ch_inputs.wmparc,
-        ch_inputs.aparc_aseg,
+        ch_inputs.sbref
+            .filter{ it[1] },
+        ch_inputs.rev_dwi
+            .filter{ it[1] },
+        ch_inputs.rev_sbref
+            .filter{ it[1] },
+        ch_inputs.wmparc
+            .filter{ it[1] },
+        ch_inputs.aparc_aseg
+            .filter{ it[1] },
         ch_topup_config,
         ch_bet_template,
         ch_bet_probability,
         ch_inputs.lesion
+            .filter{ it[1] }
     )
     ch_versions = ch_versions.mix(RUN.out.versions)
 
@@ -91,7 +99,7 @@ workflow NF_TRACTOFLOW {
     //
     softwareVersionsToYAML(ch_versions)
         .collectFile(
-            storeDir: "${params.output_dir}/pipeline_info",
+            storeDir: "${params.outdir}/pipeline_info",
             name:  'nf-tractoflow_software_'  + 'mqc_'  + 'versions.yml',
             sort: true,
             newLine: true

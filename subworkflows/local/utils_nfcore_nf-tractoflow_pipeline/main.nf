@@ -15,10 +15,8 @@ include { completionEmail           } from '../../nf-core/utils_nfcore_pipeline'
 include { completionSummary         } from '../../nf-core/utils_nfcore_pipeline'
 include { UTILS_NFCORE_PIPELINE     } from '../../nf-core/utils_nfcore_pipeline'
 include { UTILS_NEXTFLOW_PIPELINE   } from '../../nf-core/utils_nextflow_pipeline'
-
-include { IO_SAFECASTINPUTS         } from '../../../modules/local/io/safecastinputs/main'
-include { IO_READBIDS               } from '../../../modules/nf-scil/io/readbids/main'
-
+include { IO_READBIDS               } from '../../../modules/nf-neuro/io/readbids/main'
+include { IO_SAFECASTINPUTS         } from '../../../modules/local/io/safecastinputs'
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     SUBWORKFLOW TO INITIALISE PIPELINE
@@ -38,6 +36,7 @@ workflow PIPELINE_INITIALISATION {
     main:
 
     ch_versions = Channel.empty()
+    ch_samplesheet = Channel.empty()
 
     //
     // Print version and exit if required and dump pipeline parameters to JSON file
@@ -69,47 +68,54 @@ workflow PIPELINE_INITIALISATION {
     //
     // Create channel from input file provided through params.input
     //
-    ch_input_sheets = Channel
-        .fromList(samplesheetToList(params.input, "${projectDir}/assets/schema_raw_input.json"))
-        .map{
-            meta, dwi, bval, bvec, sbref, rev_dwi, rev_bval, rev_bvec, rev_sbref, t1, wmparc, aparc_aseg ->
-                return [
-                    [id: meta],
-                    dwi,
-                    bval,
-                    bvec,
-                    sbref ?: null,
-                    rev_dwi ?: null,
-                    rev_bval ?: null,
-                    rev_bvec ?: null,
-                    rev_sbref ?: null,
-                    t1,
-                    wmparc ?: null,
-                    aparc_aseg ?: null
-                ]
-        }
-        .groupTuple()
-        .map{ samplesheet ->
-            validateInputSamplesheet(samplesheet)
-        }
+    if (params.input) {
+        ch_input_sheets = Channel
+            .fromList(samplesheetToList(params.input, "${projectDir}/assets/schema_raw_input.json"))
+            .map{
+                meta, dwi, bval, bvec, sbref, rev_dwi, rev_bval, rev_bvec, rev_sbref, t1, wmparc, aparc_aseg, lesion ->
+                    return [
+                        meta,
+                        dwi,
+                        bval,
+                        bvec,
+                        sbref ?: [],
+                        rev_dwi ?: [],
+                        rev_bval ?: [],
+                        rev_bvec ?: [],
+                        rev_sbref ?: [],
+                        t1,
+                        wmparc ?: [],
+                        aparc_aseg ?: [],
+                        lesion ?: []
+                    ]
+            }
+            .map{ samplesheet ->
+                validateInputSamplesheet(samplesheet)
+            }
 
-    ch_bids_sheets = Channel
+        IO_SAFECASTINPUTS(ch_input_sheets)
+        ch_samplesheet = ch_samplesheet.mix(IO_SAFECASTINPUTS.out.safe_inputs)
+    }
+
+    if (params.bids) {
+        ch_bids_sheets = Channel
         .fromList(samplesheetToList(params.bids, "${projectDir}/asset/schema_bids_input.json"))
         .map{
             dbname, bidsfolder, fsfolder, bidsignore ->
                 return [[name: dbname], bidsfolder, fsfolder ?: [], bidsignore ?: []]
         }
 
-    IO_READBIDS ( ch_bids_sheets.map{ it[1..-1] } )
-    ch_versions = ch_versions.mix(IO_READBIDS.out.versions)
+        IO_READBIDS ( ch_bids_sheets.map{ it[1..-1] } )
+        ch_versions = ch_versions.mix(IO_READBIDS.out.versions)
 
-    ch_bids_sheets = IO_READBIDS.out.bidsstructure
-        .map{ samplesheet -> 
-            validateBidsSamplesheet(samplesheet)
-        }
-        .reduce{ a, b -> a + b }
+        ch_bids_sheets = IO_READBIDS.out.bidsstructure
+            .map{ samplesheet ->
+                validateBidsSamplesheet(samplesheet)
+            }
+            .reduce{ a, b -> a + b }
 
-    ch_samplesheet = ch_bids_sheets.mix(ch_input_sheets.raw)
+        ch_samplesheet = ch_samplesheet.mix(ch_bids_sheets)
+    }
 
     IO_SAFECASTINPUTS( ch_samplesheet )
 

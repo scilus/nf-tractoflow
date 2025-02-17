@@ -42,7 +42,7 @@ nextflow_workflow {
 
             params {
                 test_data   = ''
-                output_dir      = null
+                outdir      = null
             }
 
             workflow {
@@ -94,7 +94,7 @@ nextflow_workflow {
 
             params {
                 test_data   = ''
-                output_dir      = null
+                outdir      = null
             }
 
             workflow {

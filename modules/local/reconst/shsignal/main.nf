@@ -11,8 +11,8 @@ process RECONST_SHSIGNAL {
         tuple val(meta), path(dwi), path(bval), path(bvec),path(mask)
 
     output:
-        tuple val(meta), path("*__ad.nii.gz")                      , emit: sh_signal
-        path "versions.yml"                                        , emit: versions
+        tuple val(meta), path("*__dwi_sh.nii.gz")   , emit: sh_signal
+        path "versions.yml"                         , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -43,7 +43,7 @@ process RECONST_SHSIGNAL {
     scil_dwi_to_sh.py dwi_sh_shells.nii.gz bval_sh_shells bvec_sh_shells \
         ${prefix}__dwi_sh.nii.gz \
         $sh_order $sh_basis $smoothing \
-        $attenuation_only $mask $b0_threshold
+        $attenuation_only $b0_threshold $args
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
