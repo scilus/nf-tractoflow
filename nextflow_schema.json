@@ -822,6 +822,66 @@
                     "hidden": true
                 }
             }
+        },
+        "subworkflows_hidden_options": {
+            "properties": {
+                "preproc_dwi_run_denoising": {
+                    "type": "boolean",
+                    "hidden": true
+                },
+                "preproc_dwi_run_degibbs": {
+                    "type": "boolean",
+                    "hidden": true
+                },
+                "topup_eddy_run_topup": {
+                    "type": "boolean",
+                    "hidden": true
+                },
+                "topup_eddy_run_eddy": {
+                    "type": "boolean",
+                    "hidden": true
+                },
+                "preproc_dwi_run_N4": {
+                    "type": "boolean",
+                    "hidden": true
+                },
+                "preproc_t1_run_denoising": {
+                    "type": "boolean",
+                    "hidden": true
+                },
+                "preproc_t1_run_N4": {
+                    "type": "boolean",
+                    "hidden": true
+                },
+                "preproc_t1_run_synthbet": {
+                    "type": "boolean",
+                    "hidden": true
+                },
+                "preproc_t1_run_ants_bet": {
+                    "type": "boolean",
+                    "hidden": true
+                },
+                "preproc_t1_run_crop": {
+                    "type": "boolean",
+                    "hidden": true
+                },
+                "preproc_dwi_run_resampling": {
+                    "type": "boolean",
+                    "hidden": true
+                },
+                "preproc_t1_run_resampling": {
+                    "type": "boolean",
+                    "hidden": true
+                },
+                "frf_average_from_data": {
+                    "type": "boolean",
+                    "hidden": true
+                },
+                "run_pft": {
+                    "type": "boolean",
+                    "hidden": true
+                }
+            }
         }
     },
     "allOf": [
@@ -869,6 +929,9 @@
         },
         {
             "$ref": "#/$defs/local_tractography_options"
+        },
+        {
+            "$ref": "#/$defs/subworkflows_hidden_options"
         }
     ],
     "properties": {

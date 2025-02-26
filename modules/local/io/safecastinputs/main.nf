@@ -3,7 +3,7 @@ process IO_SAFECASTINPUTS {
     label 'process_single'
 
     input:
-        tuple val(meta), path(dwi), path(bval), path(bvec), path(sbref), path(rev_dwi), path(rev_bval), path(rev_bvec), path(rev_sbref), path(t1), path(wmparc), path(aparc_aseg), path(lesion)
+        tuple val(meta), path(dwi, stageAs: "dwi"), path(bval, stageAs: "bval"), path(bvec, stageAs: "bvec"), path(sbref, stageAs: "sbref"), path(rev_dwi, stageAs: "rev"), path(rev_bval, stageAs: "rval"), path(rev_bvec, stageAs: "rvec"), path(rev_sbref, stageAs: "rbref"), path(t1, stageAs: "t1"), path(wmparc, stageAs: "wmparc"), path(aparc_aseg, stageAs: "aparc+aseg"), path(lesion, stageAs: "lesion")
     output:
         tuple val(meta), path("$out_dwi"), path("$out_bval"), path("$out_bvec"), path("$out_sbref"), path("$out_rev_dwi"), path("$out_rev_bval"), path("$out_rev_bvec"), path("$out_rev_sbref"), path("$out_t1"), path("$out_wmparc"), path("$out_aparc_aseg"), path("$out_lesion"), emit: safe_inputs
     script:
@@ -31,7 +31,7 @@ process IO_SAFECASTINPUTS {
     [ -f "$t1" ] && ln -sf $t1 t1.nii.gz
     [ -f "$wmparc" ] && ln -sf $wmparc wmparc.nii.gz
     [ -f "$aparc_aseg" ] && ln -sf $aparc_aseg aparc+aseg.nii.gz
-    [ -f "$lesion" ] && ln -sf $lesion lesion.nii,gz
+    [ -f "$lesion" ] && ln -sf $lesion lesion.nii.gz
     exit 0
     """
 }
