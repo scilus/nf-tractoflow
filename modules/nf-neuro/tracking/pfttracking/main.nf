@@ -54,9 +54,9 @@ process TRACKING_PFTTRACKING {
         --interface ${prefix}__interface.nii.gz -f
 
     if [ "${pft_seeding_mask}" == "wm" ]; then
-        scil_volume_math.py convert $wm ${prefix}__mask_wm.nii.gz \
+        scil_volume_math.py convert $wm ${prefix}__pft_seeding_mask.nii.gz \
             --data_type uint8 -f
-        scil_volume_math.py union ${prefix}__mask_wm.nii.gz \
+        scil_volume_math.py union ${prefix}__pft_seeding_mask.nii.gz \
             ${prefix}__interface.nii.gz ${prefix}__pft_seeding_mask.nii.gz\
             --data_type uint8 -f
 

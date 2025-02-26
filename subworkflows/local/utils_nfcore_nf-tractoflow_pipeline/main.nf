@@ -117,10 +117,8 @@ workflow PIPELINE_INITIALISATION {
         ch_samplesheet = ch_samplesheet.mix(ch_bids_sheets)
     }
 
-    IO_SAFECASTINPUTS( ch_samplesheet )
-
     emit:
-    samplesheet = IO_SAFECASTINPUTS.out.safe_inputs
+    samplesheet = ch_samplesheet
     versions    = ch_versions
 }
 
