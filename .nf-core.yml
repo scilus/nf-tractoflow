@@ -20,8 +20,9 @@ lint:
     - manifest.name
     - manifest.homePage
 repository_type: pipeline
+name: nf-tractoflow
+org: scilus
 template:
-  prefix: nf
   skip:
     - igenomes
     - fastqc
