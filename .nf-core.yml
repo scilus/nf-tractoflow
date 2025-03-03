@@ -32,7 +32,6 @@ template:
   skip_features:
     - igenomes
     - fastqc
-    - seqera_platform
-    - adaptivecard
     - slackreport
+    - seqera_platform
   version: 1.0dev
