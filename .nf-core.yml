@@ -27,7 +27,7 @@ template:
   force: false
   is_nfcore: false
   name: tractoflow
-  org: nf-core
+  org: scilus
   outdir: .
   skip_features:
     - igenomes

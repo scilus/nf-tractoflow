@@ -1,9 +1,9 @@
 #!/usr/bin/env nextflow
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    nf-core/tractoflow
+    scilus/tractoflow
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Github : https://github.com/nf-core/tractoflow
+    Github : https://github.com/scilus/tractoflow
 ----------------------------------------------------------------------------------------
 */
 
@@ -25,7 +25,7 @@ include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_trac
 //
 // WORKFLOW: Run main analysis pipeline depending on type of input
 //
-workflow NFCORE_TRACTOFLOW {
+workflow SCILUS_TRACTOFLOW {
 
     take:
     samplesheet // channel: samplesheet read in from --input
@@ -65,7 +65,7 @@ workflow {
     //
     // WORKFLOW: Run main workflow
     //
-    NFCORE_TRACTOFLOW (
+    SCILUS_TRACTOFLOW (
         PIPELINE_INITIALISATION.out.samplesheet
     )
     //
@@ -78,7 +78,7 @@ workflow {
         params.outdir,
         params.monochrome_logs,
         params.hook_url,
-        NFCORE_TRACTOFLOW.out.multiqc_report
+        SCILUS_TRACTOFLOW.out.multiqc_report
     )
 }
 

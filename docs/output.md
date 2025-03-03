@@ -1,4 +1,4 @@
-# nf-core/tractoflow: Output
+# scilus/tractoflow: Output
 
 ## Introduction
 

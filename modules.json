@@ -1,6 +1,6 @@
 {
-    "name": "nf-core/tractoflow",
-    "homePage": "https://github.com/nf-core/tractoflow",
+    "name": "scilus/tractoflow",
+    "homePage": "https://github.com/scilus/tractoflow",
     "repos": {
         "https://github.com/nf-core/modules.git": {
             "modules": {

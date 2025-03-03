@@ -1,4 +1,4 @@
-# nf-core/tractoflow: Citations
+# scilus/tractoflow: Citations
 
 ## [nf-core](https://pubmed.ncbi.nlm.nih.gov/32055031/)
 
