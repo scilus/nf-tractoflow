@@ -26,8 +26,8 @@ template:
   description: Human diffusion MRI processing and tractography
   force: false
   is_nfcore: false
-  name: tractoflow
-  org: nf-core
+  name: nf-tractoflow
+  org: scilus
   outdir: .
   skip_features:
     - igenomes
