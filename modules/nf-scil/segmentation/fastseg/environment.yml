@@ -1,0 +1,8 @@
+---
+name: "segmentation_fastseg"
+channels:
+  - Docker
+  - Apptainer
+dependencies:
+  - "FSL"
+  - "Scilpy"

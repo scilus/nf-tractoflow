@@ -1,18 +1,13 @@
 {
-    "name": "nf/tractoflow",
-    "homePage": "https://github.com/nf/tractoflow",
+    "name": "scilus/nf-tractoflow",
+    "homePage": "https://github.com/scilus/nf-tractoflow",
     "repos": {
         "https://github.com/nf-core/modules.git": {
             "modules": {
                 "nf-core": {
-                    "fastqc": {
-                        "branch": "master",
-                        "git_sha": "f4ae1d942bd50c5c0b9bd2de1393ce38315ba57c",
-                        "installed_by": ["modules"]
-                    },
                     "multiqc": {
                         "branch": "master",
-                        "git_sha": "b7ebe95761cd389603f9cc0e0dc384c0f663815a",
+                        "git_sha": "f0719ae309075ae4a291533883847c3f7c441dad",
                         "installed_by": ["modules"]
                     }
                 }
@@ -21,18 +16,168 @@
                 "nf-core": {
                     "utils_nextflow_pipeline": {
                         "branch": "master",
-                        "git_sha": "5caf7640a9ef1d18d765d55339be751bb0969dfa",
+                        "git_sha": "c2b22d85f30a706a3073387f30380704fcae013b",
                         "installed_by": ["subworkflows"]
                     },
                     "utils_nfcore_pipeline": {
                         "branch": "master",
-                        "git_sha": "5caf7640a9ef1d18d765d55339be751bb0969dfa",
+                        "git_sha": "51ae5406a030d4da1e49e4dab49756844fdd6c7a",
                         "installed_by": ["subworkflows"]
                     },
-                    "utils_nfvalidation_plugin": {
+                    "utils_nfschema_plugin": {
                         "branch": "master",
-                        "git_sha": "5caf7640a9ef1d18d765d55339be751bb0969dfa",
+                        "git_sha": "2fd2cd6d0e7b273747f32e465fdc6bcc3ae0814e",
                         "installed_by": ["subworkflows"]
+                    }
+                }
+            }
+        },
+        "https://github.com/scilus/nf-scil.git": {
+            "modules": {
+                "nf-scil": {
+                    "betcrop/antsbet": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "317f9f98b9b1faa93e72ff61560bb765d6fdc364",
+                        "installed_by": ["preproc_t1"]
+                    },
+                    "betcrop/cropvolume": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "8a5ea101e53d2bb73618ca71bf9817df0e470e37",
+                        "installed_by": ["preproc_dwi", "preproc_t1"]
+                    },
+                    "betcrop/fslbetcrop": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "de49903e49cabf71a942b43e6320617aa8dc8a43",
+                        "installed_by": ["preproc_dwi"]
+                    },
+                    "denoising/mppca": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "317f9f98b9b1faa93e72ff61560bb765d6fdc364",
+                        "installed_by": ["preproc_dwi"]
+                    },
+                    "denoising/nlmeans": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "317f9f98b9b1faa93e72ff61560bb765d6fdc364",
+                        "installed_by": ["preproc_t1"]
+                    },
+                    "image/resample": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "85eebbc9e881e1ac930a22ceada63c44c099e1d3",
+                        "installed_by": ["preproc_t1", "preproc_dwi"]
+                    },
+                    "io/readbids": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "317f9f98b9b1faa93e72ff61560bb765d6fdc364",
+                        "installed_by": ["modules"]
+                    },
+                    "preproc/eddy": {
+                        "branch": "main",
+                        "git_sha": "a275f58196407fb05d4d9730ca781f584b00048c",
+                        "installed_by": ["topup_eddy"]
+                    },
+                    "preproc/n4": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "317f9f98b9b1faa93e72ff61560bb765d6fdc364",
+                        "installed_by": ["preproc_dwi", "preproc_t1"]
+                    },
+                    "preproc/normalize": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "317f9f98b9b1faa93e72ff61560bb765d6fdc364",
+                        "installed_by": ["preproc_dwi"]
+                    },
+                    "preproc/topup": {
+                        "branch": "main",
+                        "git_sha": "8863c9b6f0757b9c41920b5222d10d2c580009d2",
+                        "installed_by": ["topup_eddy"]
+                    },
+                    "reconst/dtimetrics": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "317f9f98b9b1faa93e72ff61560bb765d6fdc364",
+                        "installed_by": ["modules"]
+                    },
+                    "reconst/fodf": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "62979e1455a723b1f1a149a4353cbcc2dcd318ba",
+                        "installed_by": ["modules"]
+                    },
+                    "reconst/frf": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "317f9f98b9b1faa93e72ff61560bb765d6fdc364",
+                        "installed_by": ["modules"]
+                    },
+                    "reconst/meanfrf": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "317f9f98b9b1faa93e72ff61560bb765d6fdc364",
+                        "installed_by": ["modules"]
+                    },
+                    "register/anattodwi": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "317f9f98b9b1faa93e72ff61560bb765d6fdc364",
+                        "installed_by": ["registration"]
+                    },
+                    "registration/ants": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "317f9f98b9b1faa93e72ff61560bb765d6fdc364",
+                        "installed_by": ["registration"]
+                    },
+                    "registration/antsapplytransforms": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "4c7e79daf65774c9f11937d0dcab117ae6eb64a1",
+                        "installed_by": ["modules"]
+                    },
+                    "segmentation/fastseg": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "317f9f98b9b1faa93e72ff61560bb765d6fdc364",
+                        "installed_by": ["anatomical_segmentation"]
+                    },
+                    "segmentation/freesurferseg": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "62979e1455a723b1f1a149a4353cbcc2dcd318ba",
+                        "installed_by": ["anatomical_segmentation"]
+                    },
+                    "tracking/localtracking": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "62979e1455a723b1f1a149a4353cbcc2dcd318ba",
+                        "installed_by": ["modules"]
+                    },
+                    "tracking/pfttracking": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "317f9f98b9b1faa93e72ff61560bb765d6fdc364",
+                        "installed_by": ["modules"]
+                    },
+                    "utils/extractb0": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "317f9f98b9b1faa93e72ff61560bb765d6fdc364",
+                        "installed_by": ["topup_eddy", "preproc_dwi"]
+                    }
+                }
+            },
+            "subworkflows": {
+                "nf-scil": {
+                    "anatomical_segmentation": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "f19275c7cd2c78b5201fd9707b00aa6e6730efa8",
+                        "installed_by": ["subworkflows"]
+                    },
+                    "preproc_dwi": {
+                        "branch": "main",
+                        "git_sha": "455be4fdaff99dcb1d81f8adff17da933f71cc87",
+                        "installed_by": ["subworkflows"]
+                    },
+                    "preproc_t1": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "2d0ec09328b7ee6697406a177046f6482a3c2ba7",
+                        "installed_by": ["subworkflows"]
+                    },
+                    "registration": {
+                        "branch": "review/alex_preproc_dwi",
+                        "git_sha": "10d399e7b2dcdf6891e33170d2e7ba66b9147411",
+                        "installed_by": ["subworkflows"]
+                    },
+                    "topup_eddy": {
+                        "branch": "main",
+                        "git_sha": "7543d392b565b1a56885c813dd3c896163ce8fcc",
+                        "installed_by": ["preproc_dwi"]
                     }
                 }
             }
