@@ -13,7 +13,7 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { NF-TRACTOFLOW  } from './workflows/nf-tractoflow'
+include { NF_TRACTOFLOW  } from './workflows/nf-tractoflow'
 include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_nf-tractoflow_pipeline'
 include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_nf-tractoflow_pipeline'
 /*
@@ -25,7 +25,7 @@ include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_nf-t
 //
 // WORKFLOW: Run main analysis pipeline depending on type of input
 //
-workflow SCILUS_NF-TRACTOFLOW {
+workflow SCILUS_NF_TRACTOFLOW {
 
     take:
     samplesheet // channel: samplesheet read in from --input
@@ -35,11 +35,11 @@ workflow SCILUS_NF-TRACTOFLOW {
     //
     // WORKFLOW: Run pipeline
     //
-    NF-TRACTOFLOW (
+    NF_TRACTOFLOW (
         samplesheet
     )
     emit:
-    multiqc_report = NF-TRACTOFLOW.out.multiqc_report // channel: /path/to/multiqc_report.html
+    multiqc_report = NF_TRACTOFLOW.out.multiqc_report // channel: /path/to/multiqc_report.html
 }
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -65,7 +65,7 @@ workflow {
     //
     // WORKFLOW: Run main workflow
     //
-    SCILUS_NF-TRACTOFLOW (
+    SCILUS_NF_TRACTOFLOW (
         PIPELINE_INITIALISATION.out.samplesheet
     )
     //
@@ -78,7 +78,7 @@ workflow {
         params.outdir,
         params.monochrome_logs,
         params.hook_url,
-        SCILUS_NF-TRACTOFLOW.out.multiqc_report
+        SCILUS_NF_TRACTOFLOW.out.multiqc_report
     )
 }
 
