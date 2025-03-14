@@ -48,7 +48,6 @@ workflow SCILUS_NF_TRACTOFLOW {
 */
 
 workflow {
-
     main:
     //
     // SUBWORKFLOW: Run initialisation tasks
@@ -77,7 +76,6 @@ workflow {
         params.plaintext_email,
         params.outdir,
         params.monochrome_logs,
-        params.hook_url,
         SCILUS_NF_TRACTOFLOW.out.multiqc_report
     )
 }

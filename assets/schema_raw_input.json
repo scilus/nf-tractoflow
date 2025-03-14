@@ -1,5 +1,5 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://raw.githubusercontent.com/AlexVCaron/nf-tractoflow/master/assets/schema_raw_input.json",
     "title": "nf-tractoflow pipeline - params.input schema",
     "description": "Schema for the file provided with params.input",
@@ -7,7 +7,7 @@
     "items": {
         "type": "object",
         "minProperties": 5,
-        "maxProperties": 12,
+        "maxProperties": 13,
         "properties": {
             "subject": {
                 "type": "string",
@@ -179,6 +179,21 @@
                     }
                 ],
                 "errorMessage": "Segmentation of the cortical parcellation in Nifti format, cannot contain spaces and must have extension '.nii' or '.nii.gz'"
+            },
+            "lesion": {
+                "type": "string",
+                "anyOf": [
+                    {
+                        "format": "file-path",
+                        "exists": true,
+                        "pattern": "^\\S+(\\.nii)?\\.gz$"
+                    },
+                    {
+                        "format": "url",
+                        "mimetype": "application/gzip"
+                    }
+                ],
+                "errorMessage": "Lesion mask or map in Nifti format, cannot contain spaces and must have extension '.nii' or '.nii.gz'"
             }
         },
         "required": ["subject", "dwi", "bval", "bvec", "t1"]
