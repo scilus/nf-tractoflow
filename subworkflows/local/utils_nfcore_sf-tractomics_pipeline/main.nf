@@ -351,7 +351,7 @@ def parseParticipantsTsv(participants_path, ch_with_proper_meta) {
     // Join with participants.tsv content
     def ch_covariates = ch_original_meta
         .map { key, meta -> [[id: key.id, session: key.session], key, meta] }
-        .join( // Create temporary keys for the join, we only join on id and session, which are more likely to be present in both sides of the join.
+        .join( // Create temporary channel for the join, we only join on id and session, which are more likely to be present in both sides of the join.
             participants_content.map { key, content -> [[id: key.id, session: key.session], key, content] },
             by: 0, remainder: true
         )
