@@ -348,17 +348,25 @@ def parseParticipantsTsv(participants_path, ch_with_proper_meta) {
             return [key, meta]
         }
 
+    def union_key = [0,1,2]
+    if (!all_tsv_headers.contains("run")) {
+        union_key = [0,1]
+    }
+    if (!all_tsv_headers.contains("session")) {
+        union_key = [0]
+    }
+
     // Join with participants.tsv content
     def ch_covariates = ch_original_meta
-        .map { key, meta -> [[id: key.id, session: key.session], key, meta] }
-        .join( // Create temporary channel for the join, we only join on id and session, which are more likely to be present in both sides of the join.
-            participants_content.map { key, content -> [[id: key.id, session: key.session], key, content] },
-            by: 0, remainder: true
+        .map { key, meta -> [key.id, key.session, key.run, key, meta] }
+        .combine( // Create temporary channel for the join, we only join on id and session, which are more likely to be present in both sides of the join.
+            participants_content.map { key, content -> [key.id, key.session, key.run, key, content] },
+            by: union_key, remainder: true
         )
-        .filter { item -> item[2] != null }  // keep only items where original_meta is present
+        .filter { item -> item[4] != null }  // keep only items where original_meta is present
         .map { item ->
-            def original_meta = item[2]
-            def tsv_meta      = item[4]
+            def original_meta = item[4]
+            def tsv_meta      = item[6]
             def extra_meta = tsv_meta ?: default_content.collectEntries { k, v -> [k.toLowerCase(), v] }
             return [original_meta, extra_meta]
         }
