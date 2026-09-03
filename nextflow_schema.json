@@ -1091,6 +1091,54 @@
                     "type": "string",
                     "description": "TSV file of the reference site used to harmonize the current site (e.g. the output TSV from stats/metrics in roi).",
                     "help_text": "TSV file of the reference site used to harmonize the current site (e.g. the output TSV from stats/metrics in roi)."
+                },
+                "harmonization_ignore_sex": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If set, ignore the sex covariate in the data. If there is only one value in the column, the variable is ignored by the model.",
+                    "help_text": "If set, ignore the sex covariate in the data. If there is only one value in the column, the variable is ignored by the model."
+                },
+                "harmonization_ignore_handedness": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If set, ignore the handedness covariate in the data. If there is only one value in the column, the variable is ignored by the model.",
+                    "help_text": "If set, ignore the handedness covariate in the data. If there is only one value in the column, the variable is ignored by the model."
+                },
+                "harmonization_regul_ref": {
+                    "type": "number",
+                    "default": 0,
+                    "description": "Regularization parameter for the reference site data.",
+                    "help_text": "Regularization parameter for the reference site data."
+                },
+                "harmonization_regul_mov": {
+                    "type": "number",
+                    "default": -1,
+                    "description": "Regularization parameter for the moving site data. Set to '-1' for automatic tuning [default=0 for pairwise; -1 for clinical].",
+                    "help_text": "Regularization parameter for the moving site data. Set to '-1' for automatic tuning [default=0 for pairwise; -1 for clinical]"
+                },
+                "harmonization_nu": {
+                    "type": "number",
+                    "default": 5,
+                    "description": "Combat Clinical hyperparameter for the standard deviation estimation of the moving site data. It must be >=0. [5]",
+                    "help_text": "Combat Clinical hyperparameter for the standard deviation estimation of the moving site data. It must be >=0. [5]"
+                },
+                "harmonization_tau": {
+                    "type": "number",
+                    "default": 2,
+                    "description": "Combat Clinical hyperparameter for the covariate fit of the moving site data. It must be >= 1.",
+                    "help_text": "Combat Clinical hyperparameter for the covariate fit of the moving site data. It must be >= 1."
+                },
+                "harmonization_limit_age": {
+                    "type": "boolean",
+                    "description": "If set, exclude reference site subjects with age outside the range of the moving site subject ages.",
+                    "help_text": "If set, exclude reference site subjects with age outside the range of the moving site subject ages."
+                },
+                "harmonization_method": {
+                    "type": "string",
+                    "default": "clinical",
+                    "description": "Harmonization method to use.",
+                    "help_text": "Methods available: clinical uses a priori from the reference site to fit the moving site, pairwise uses both moving and reference data to fit the covariates regression parameters (Beta_mov).",
+                    "enum": ["clinical", "pairwise"]
                 }
             },
             "help_text": "Parameters to configure the harmonization subworkflow."

@@ -38,6 +38,7 @@ workflow SF_TRACTOMICS {
 
     ch_inputs = ch_inputs
         .multiMap{ meta, t1, wmparc, aparcaseg, dwi_bval_bvec, rev_dwi_bval_bvec, b0, rev_b0, lesion ->
+            meta: meta
             t1: [meta, t1]
             wmparc: [meta, wmparc]
             aparcaseg: [meta, aparcaseg]
@@ -47,6 +48,14 @@ workflow SF_TRACTOMICS {
             rev_b0: [meta, rev_b0]
             lesion: [meta, lesion]
         }
+
+    if ( params.harmonization_reference ) {
+        ch_inputs.meta
+            .collect()
+            .map { meta_list ->
+                validateMinimumParticipantsPerSite(meta_list)
+            }
+    }
 
     ch_versions = channel.empty()
     ch_sub_multiqc_files = channel.empty()
@@ -267,7 +276,6 @@ workflow SF_TRACTOMICS {
         // while keeping the header from the first
         // file only and skipping it in the rest.
         ch_collection_mean_input = ATLAS_ROIMETRICS.out.stats_tab_mean
-
         ch_collection_mean_input = collectStatsFiles(ch_collection_mean_input, "space-native_atlas-iit_label-mean_desc-roi_stats.tsv", "${params.outdir}/metrics/")
         ch_global_multiqc_files = ch_global_multiqc_files.mix(ch_collection_mean_input)
 
@@ -529,6 +537,32 @@ def collectStatsFiles(ch_stats_files, name, storeDir) {
 
             return output_file
         }
+}
+
+def validateMinimumParticipantsPerSite(meta_list) {
+    def participants_per_site = [:].withDefault { [] as Set }
+
+    meta_list.each { meta ->
+        def meta_site = meta.get('site')
+        def participant = meta.get('id')
+        if (meta_site && participant) {
+            participants_per_site[meta_site.toString().trim()].add(participant.toString().trim())
+        }
+    }
+
+    def sites_with_too_few_participants = [:]
+    participants_per_site.each { entry ->
+        if (entry.value.size() < 5) {
+            sites_with_too_few_participants[entry.key] = entry.value
+        }
+    }
+    if (sites_with_too_few_participants) {
+        def site_errors = []
+        sites_with_too_few_participants.each { entry ->
+            site_errors << "Site '${entry.key}' has ${entry.value.size()} participant(s); at least 5 are required."
+        }
+        error "Harmonization cannot continue:\n${site_errors.join('\n')}"
+    }
 }
 
 /*
